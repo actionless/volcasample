@@ -1,4 +1,84 @@
 #!/usr/bin/env python
 # encoding: UTF-8
 
+import ast
+import os.path
+import sys
 
+from setuptools import setup
+
+#import distutils.command.build
+
+try:
+    # For setup.py install
+    from volcasample import __version__ as version
+except ImportError:
+    # For pip installations
+    version = str(
+        ast.literal_eval(
+            open(os.path.join(
+                os.path.dirname(__file__),
+                "volcasample", "__init__.py"),
+                'r').read().split("=")[-1].strip()
+        )
+    )
+
+__doc__ = open(os.path.join(os.path.dirname(__file__), "README.rst"),
+               'r').read()
+
+setup(
+    name="volcasample",
+    version=version,
+    description="Python wrapping of KORG Volca sample utilities.",
+    author="D Haynes",
+    author_email="tundish@thuswise.org",
+    url="https://github.com/tundish/volcasample",
+    long_description=__doc__,
+    classifiers=[
+        "Operating System :: OS Independent",
+        "Programming Language :: Python :: 3.4",
+        "Programming Language :: Python :: 3.5",
+        "License :: OSI Approved :: BSD License",
+    ],
+    packages=[
+        "volcasample",
+        "volcasample.test",
+    ],
+    package_data={
+        "volcasample": [
+            "doc/*.rst",
+            "doc/_templates/*.css",
+            "doc/html/*.html",
+            "doc/html/*.js",
+            "doc/html/_sources/*",
+            "doc/html/_static/css/*",
+            "doc/html/_static/font/*",
+            "doc/html/_static/js/*",
+            "doc/html/_static/*.css",
+            "doc/html/_static/*.gif",
+            "doc/html/_static/*.js",
+            "doc/html/_static/*.png",
+        ],
+        "volcasample.test": [
+        ],
+    },
+    install_requires=[],
+    extras_require={
+        "dev": [
+            "pep8>=1.6.2",
+        ],
+        "docbuild": [
+            "babel>=2.2.0",
+            "sphinx-argparse>=0.1.15",
+            "sphinxcontrib-seqdiag>=0.8.4",
+        ],
+    },
+    tests_require=[
+    ],
+    entry_points={
+        "console_scripts": [
+            "volcasample = volcasample.main:run",
+        ],
+    },
+    zip_safe=False
+)
