@@ -1,21 +1,34 @@
 #!/usr/bin/env python3
 # encoding: UTF-8
 
+import ctypes
 import unittest
 
-import ctypes
-import os.path
-import pkg_resources
+import volcasample.syro
+from volcasample.syro import get_comp_size
+from volcasample.syro import pick_lib
 
-def lib_paths(pkg="volcasample", locn="lib"):
-    dirPath = pkg_resources.resource_filename(pkg, locn)
-    return (
-        os.path.join(dirPath, fN)
-        for fN in pkg_resources.resource_listdir(pkg, locn)
-    )
-    
+
 class DiscoveryTests(unittest.TestCase):
 
     def test_find_so(self):
-        lib = ctypes.cdll.LoadLibrary(next(lib_paths()))
+        lib = pick_lib()
         self.assertIsInstance(lib, ctypes.CDLL)
+
+class SyroTypeTests(unittest.TestCase):
+
+    def test_endian(self):
+        self.assertEqual(
+            0,
+            volcasample.syro.Endian.LittleEndian.value.value
+        )
+        self.assertEqual(
+            1,
+            volcasample.syro.Endian.BigEndian.value.value
+        )
+
+class SyroCompTests(unittest.TestCase):
+
+    def test_GetCompSize(self):
+        self.fail()
+        get_comp_size()
