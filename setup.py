@@ -57,6 +57,8 @@ setup(
             "doc/html/_static/*.gif",
             "doc/html/_static/*.js",
             "doc/html/_static/*.png",
+            "lib/*.so",
+            "lib/*.dll",
         ],
         "volcasample.test": [
         ],
