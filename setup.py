@@ -75,7 +75,7 @@ setup(
     ],
     options={
         "build_ext": {
-            "build_lib": "lib",
+            "build_lib": "volcasample/lib",
         }
     },
     install_requires=[],
