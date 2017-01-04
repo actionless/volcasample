@@ -61,7 +61,19 @@ setup(
         "volcasample.test": [
         ],
     },
-    ext_modules=[Extension("syro", ["./syro/korg_syro_comp.c"])],
+    ext_modules=[
+        Extension(
+            name="syro",
+            sources=[
+                "./syro/korg_syro_comp.c"
+            ]
+        )
+    ],
+    options={
+        "build_ext": {
+            "build_lib": "./lib",
+        }
+    },
     install_requires=[],
     extras_require={
         "dev": [
