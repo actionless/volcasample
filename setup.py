@@ -6,8 +6,7 @@ import os.path
 import sys
 
 from setuptools import setup
-
-#import distutils.command.build
+from distutils.extension import Extension
 
 try:
     # For setup.py install
@@ -42,7 +41,7 @@ setup(
     ],
     packages=[
         "volcasample",
-        "volcasample.test",
+        #"volcasample.test",
     ],
     package_data={
         "volcasample": [
@@ -62,6 +61,7 @@ setup(
         "volcasample.test": [
         ],
     },
+    ext_modules=[Extension("syro", ["./syro/korg_syro_comp.c"])],
     install_requires=[],
     extras_require={
         "dev": [
