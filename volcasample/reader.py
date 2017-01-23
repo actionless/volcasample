@@ -33,7 +33,7 @@ def parser(description=__doc__):
         description,
         fromfile_prefix_chars="@"
     )
-    rv.add_argument("pattern", help="Set a glob path to identify WAV files")
+    rv.add_argument("--pattern", help="Set a glob path to identify WAV files")
     return rv
 
 def run():
