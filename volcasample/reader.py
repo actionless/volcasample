@@ -2,16 +2,30 @@
 # encoding: UTF-8
 
 import argparse
-import wave
+from collections import OrderedDict
+import json
+import glob
+import os.path
 import sys
+import wave
 
 __doc__ = """
 Reads metadata in WAV files.
 
 """
 
+def wav_json(metadata, path=None):
+    rv = OrderedDict([(k, getattr(metadata, k)) for k in metadata._fields])
+    if path is not None:
+        rv["path"] = path
+        rv.move_to_end("path", last=False)
+    return json.dumps(rv, indent=0, sort_keys=False)
+
 def main(args):
-    print(args.data)
+    for path in glob.glob(os.path.expanduser(args.pattern)):
+        w = wave.open(path, "rb")
+        metadata = w.getparams()
+        print(wav_json(metadata, path=os.path.abspath(path)))
     return 0
 
 def parser(description=__doc__):
@@ -19,7 +33,7 @@ def parser(description=__doc__):
         description,
         fromfile_prefix_chars="@"
     )
-    rv.add_argument("data", type=argparse.FileType("r"))
+    rv.add_argument("pattern", help="Set a glob path to identify WAV files")
     return rv
 
 def run():
