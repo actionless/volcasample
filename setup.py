@@ -61,6 +61,7 @@ setup(
             "lib/*.dll",
         ],
         "volcasample.test": [
+            "data/*.wav",
         ],
     },
     ext_modules=[
@@ -80,6 +81,9 @@ setup(
     },
     install_requires=[],
     extras_require={
+        "audio": [
+            "simpleaudio>=1.0.1",
+        ],
         "dev": [
             "pep8>=1.6.2",
         ],
