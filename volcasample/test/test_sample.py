@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # encoding: UTF-8
 
+import math
+import operator
 import sys
 import unittest
 import wave
@@ -22,6 +24,32 @@ def extract_samples(
         int.from_bytes(raw[pos + i0: pos + i1], endian, signed=True))
         for pos in range(0, nBytes, bytesPerSample * nChannels)]
 
+def find_peaks(stereo):
+    leftMin, leftMax = [fn(map(operator.itemgetter(0), stereo)) for fn in (min, max)]
+    rightMin, rightMax = [fn(map(operator.itemgetter(1), stereo)) for fn in (min, max)]
+    return leftMin, leftMax, rightMin, rightMax
+
+def mix_to_mono(stereo):
+    peaks = find_peaks(stereo)
+    posMax, negMin = max(peaks), min(peaks)
+
+    signs = [
+        -1 if abs(
+            posMax and max(left, right) / posMax
+        ) < abs(
+            negMin and min(left, right) / negMin
+        ) else 1
+        for left, right in stereo
+    ]
+
+    sqrt = math.sqrt
+    sqrtOf2 = sqrt(2)
+    vals = [
+        sqrt(left * left + right * right) / sqrtOf2
+        for left, right in stereo
+    ]
+    return [sign * val for sign, val in zip(signs, vals)]
+
 def to_mono(wav):
     nChannels = wav.getnchannels()
     if nChannels == 1:
@@ -34,26 +62,47 @@ def to_mono(wav):
         raw, nChannels, bytesPerSample, nFrames
     )
  
-    return data
+    return mix_to_mono(data)
 
 class ConversionTests(unittest.TestCase):
 
-    def test_read_samples(self):
-        stereo  = pkg_resources.resource_filename(
-            "volcasample.test", "data/380_gunshot_single-mike-koenig-short.wav"
-        )
-        with wave.open(stereo, "rb") as wav:
+    @staticmethod
+    def extract_wav_data(fP):
+        with wave.open(fP, "rb") as wav:
             nChannels = wav.getnchannels()
             bytesPerSample = wav.getsampwidth()
             nFrames = wav.getnframes()
             raw = wav.readframes(nFrames)
-            rv = extract_samples(
+            data = extract_samples(
                 raw, nChannels, bytesPerSample, nFrames
             )
+            return wav, data
 
-        self.assertEqual(nFrames, len(rv))
-        self.assertEqual((32767, 30163), max(rv))
-        self.assertEqual((-32768, -32765), min(rv))
+    def test_read_samples(self):
+        stereoFP  = pkg_resources.resource_filename(
+            "volcasample.test", "data/380_gunshot_single-mike-koenig-short.wav"
+        )
+
+        wav, data = ConversionTests.extract_wav_data(stereoFP)
+        nFrames = wav.getnframes()
+        self.assertEqual(nFrames, len(data))
+        self.assertEqual((32767, 30163), max(data))
+        self.assertEqual((-32768, -32765), min(data))
+
+    def test_find_peaks(self):
+        stereoFP  = pkg_resources.resource_filename(
+            "volcasample.test", "data/380_gunshot_single-mike-koenig-short.wav"
+        )
+
+        wav, data = ConversionTests.extract_wav_data(stereoFP)
+        self.assertEqual(32767, max(find_peaks(data)))
+        self.assertEqual(-32768, min(find_peaks(data)))
+
+    def test_mix_to_mono(self):
+        self.assertEqual([0], mix_to_mono([(0, 0)]))
+        self.assertEqual([1], mix_to_mono([(1, 1)]))
+        self.assertEqual([1], mix_to_mono([(1, -1)]))
+        self.assertEqual([1, -1 / math.sqrt(2)], mix_to_mono([(1, -1), (0, -1)]))
 
     def test_stereo_to_mono(self):
         stereo  = pkg_resources.resource_filename(
