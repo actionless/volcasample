@@ -32,6 +32,7 @@ def find_peaks(stereo):
 def mix_to_mono(stereo):
     peaks = find_peaks(stereo)
     posMax, negMin = max(peaks), min(peaks)
+    threshold = posMax / 2 ** 6
 
     signs = [
         -1 if abs(
@@ -39,6 +40,15 @@ def mix_to_mono(stereo):
         ) < abs(
             negMin and min(left, right) / negMin
         ) else 1
+        for left, right in stereo
+    ]
+
+    signs = [
+        -1 if abs(
+            negMin and min(left, right) / negMin
+        ) - abs(
+            posMax and max(left, right) / posMax
+        ) > threshold else 1
         for left, right in stereo
     ]
 
@@ -50,7 +60,7 @@ def mix_to_mono(stereo):
     ]
     return [sign * val for sign, val in zip(signs, vals)]
 
-def to_mono(wav):
+def to_mono(wav, output):
     nChannels = wav.getnchannels()
     if nChannels == 1:
         return wav
@@ -61,8 +71,22 @@ def to_mono(wav):
     data = extract_samples(
         raw, nChannels, bytesPerSample, nFrames
     )
- 
-    return mix_to_mono(data)
+    mix = mix_to_mono(data)
+
+    with wave.open(output, mode="wb") as rv:
+        rv.setparams(wav.getparams())
+        rv.setnchannels(1)
+        rv.writeframes(
+            b"".join(
+                int(i).to_bytes(
+                    bytesPerSample,
+                    byteorder="little",
+                    signed=True
+                )
+                for i in mix
+            )
+        )
+        return rv
 
 class ConversionTests(unittest.TestCase):
 
@@ -109,6 +133,6 @@ class ConversionTests(unittest.TestCase):
             "volcasample.test", "data/380_gunshot_single-mike-koenig-short.wav"
         )
         with wave.open(stereo, "rb") as data:
-            rv = to_mono(data)
+            rv = to_mono(data, "test.wav")
 
         self.fail()
