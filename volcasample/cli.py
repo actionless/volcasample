@@ -38,6 +38,9 @@ def add_project_options(parser):
         help="Create a new project."
     )
     parser.add_argument(
+        "--project", default=DFLT_LOCN,
+        help="path to project directory [{}]".format(DFLT_LOCN))
+    parser.add_argument(
         "--start", required=False,
         type=int, choices=range(0, 100), default=0,
         help="Select the project index to begin at."

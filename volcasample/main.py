@@ -27,9 +27,10 @@ def main(args):
     elif args.command == "project":
         if args.new:
             volcasample.project.Project.create(
-                ".",
+                args.project,
                 start=args.start,
-                stop=args.stop or 99)
+                stop=args.stop or 99
+            )
     return 0
 
 def run():
