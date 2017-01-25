@@ -37,7 +37,7 @@ def run():
     args = p.parse_args()
     rv = 0
     if args.version:
-        sys.stdout.write(maloja.__version__ + "\n")
+        sys.stdout.write(volcasample.__version__ + "\n")
     else:
         rv = main(args)
 
