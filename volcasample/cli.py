@@ -34,6 +34,10 @@ def add_common_options(parser):
 
 def add_project_options(parser):
     parser.add_argument(
+        "--new", action="store_true", required=False,
+        help="Create a new project."
+    )
+    parser.add_argument(
         "--start", required=False,
         type=int, choices=range(0, 100), default=0,
         help="Select the project index to begin at."

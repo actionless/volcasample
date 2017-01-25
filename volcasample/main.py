@@ -24,6 +24,12 @@ def main(args):
             w = wave.open(path, "rb")
             metadata = w.getparams()
             print(volcasample.project.wav_json(metadata, path=os.path.abspath(path)))
+    elif args.command == "project":
+        if args.new:
+            volcasample.project.Project.create(
+                ".",
+                start=args.start,
+                stop=args.stop or 99)
     return 0
 
 def run():
