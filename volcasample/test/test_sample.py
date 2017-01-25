@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # encoding: UTF-8
 
-import math
 import operator
 import sys
 import unittest
@@ -30,35 +29,10 @@ def find_peaks(stereo):
     return leftMin, leftMax, rightMin, rightMax
 
 def mix_to_mono(stereo):
-    peaks = find_peaks(stereo)
-    posMax, negMin = max(peaks), min(peaks)
-    threshold = posMax / 2 ** 6
-
-    signs = [
-        -1 if abs(
-            posMax and max(left, right) / posMax
-        ) < abs(
-            negMin and min(left, right) / negMin
-        ) else 1
+    return [
+        (left + right) // 2
         for left, right in stereo
     ]
-
-    signs = [
-        -1 if abs(
-            negMin and min(left, right) / negMin
-        ) - abs(
-            posMax and max(left, right) / posMax
-        ) > threshold else 1
-        for left, right in stereo
-    ]
-
-    sqrt = math.sqrt
-    sqrtOf2 = sqrt(2)
-    vals = [
-        sqrt(left * left + right * right) / sqrtOf2
-        for left, right in stereo
-    ]
-    return [sign * val for sign, val in zip(signs, vals)]
 
 def to_mono(wav, output):
     nChannels = wav.getnchannels()
@@ -76,16 +50,21 @@ def to_mono(wav, output):
     with wave.open(output, mode="wb") as rv:
         rv.setparams(wav.getparams())
         rv.setnchannels(1)
-        rv.writeframes(
-            b"".join(
-                int(i).to_bytes(
-                    bytesPerSample,
-                    byteorder="little",
-                    signed=True
+        try:
+            rv.writeframes(
+                b"".join(
+                    int(i).to_bytes(
+                        bytesPerSample,
+                        byteorder="little",
+                        signed=True
+                    )
+                    for i in mix
                 )
-                for i in mix
             )
-        )
+        except OverflowError as e:
+            print(min(mix))
+            print(max(mix))
+            raise
         return rv
 
 class ConversionTests(unittest.TestCase):
@@ -125,8 +104,8 @@ class ConversionTests(unittest.TestCase):
     def test_mix_to_mono(self):
         self.assertEqual([0], mix_to_mono([(0, 0)]))
         self.assertEqual([1], mix_to_mono([(1, 1)]))
-        self.assertEqual([1], mix_to_mono([(1, -1)]))
-        self.assertEqual([1, -1 / math.sqrt(2)], mix_to_mono([(1, -1), (0, -1)]))
+        self.assertEqual([0], mix_to_mono([(1, -1)]))
+        self.assertEqual([0, -1], mix_to_mono([(1, -1), (0, -1)]))
 
     def test_stereo_to_mono(self):
         stereo  = pkg_resources.resource_filename(
