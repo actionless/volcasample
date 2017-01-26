@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # encoding: UTF-8
 
+from collections import OrderedDict
 import operator
 import sys
 import unittest
@@ -18,7 +19,7 @@ class Audio:
     @staticmethod
     def metadata(params, path=None):
         rv = OrderedDict(
-            [(k, getattr(metadata, k)) for k in params._fields]
+            [(k, getattr(params, k)) for k in params._fields]
         )
         if path is not None:
             rv["path"] = path

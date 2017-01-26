@@ -8,6 +8,8 @@ import os
 import sys
 import wave
 
+from volcasample.audio import Audio
+
 __doc__ = """
 This module provides a workflow for a Volca Sample project.
 
@@ -49,4 +51,22 @@ class Project:
         for tgt in glob.glob(os.path.join(path, "??", "*.wav")):
             w = wave.open(tgt, "rb")
             params = w.getparams()
-            print(params)
+            metadata = Audio.metadata(params, tgt)
+
+            # Try to load previous metadata
+            slot = os.path.dirname(tgt)
+
+            try:
+                with open(
+                    os.path.join(slot, "metadata.json"),
+                    "r"
+                ) as prev:
+                    history = json.load(prev)
+            except FileNotFoundError:
+                history = OrderedDict([("vote", 0)])
+
+            history.update(metadata)
+            Project.progress_point(history)
+
+
+            
