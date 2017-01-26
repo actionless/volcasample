@@ -2,6 +2,7 @@
 # encoding: UTF-8
 
 from collections import OrderedDict
+import glob
 import json
 import os
 import sys
@@ -39,3 +40,13 @@ class Project:
             )
             Project.progress_point(i)
         Project.progress_point()
+
+    @staticmethod
+    def refresh(path):
+        Project.progress_point(
+            "Refreshing project at {0}".format(path)
+        )
+        for tgt in glob.glob(os.path.join(path, "??", "*.wav")):
+            w = wave.open(tgt, "rb")
+            params = w.getparams()
+            print(params)

@@ -20,7 +20,7 @@ This module provides a workflow for a Volca Sample project.
 """
 
 def main(args):
-    if args.command == "sample":
+    if args.command == "audio":
         for path in args.samples:
             w = wave.open(path, "rb")
             params = w.getparams()
@@ -32,6 +32,8 @@ def main(args):
                 start=args.start,
                 stop=args.stop or 99
             )
+        elif args.refresh:
+            volcasample.project.Project.refresh(args.project)
     return 0
 
 def run():

@@ -51,6 +51,10 @@ def add_project_options(parser):
         help="Select the project index to end on."
     )
     parser.add_argument(
+        "--refresh", action="store_true", default=False,
+        help="Refresh metadata from audio file(s) in the project."
+    )
+    parser.add_argument(
         "--preview", action="store_true", default=False,
         help="Play the audio file(s) from the project."
     )
