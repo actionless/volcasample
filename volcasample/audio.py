@@ -72,7 +72,7 @@ class Audio:
         data = Audio.extract_samples(
             raw, nChannels, bytesPerSample, nFrames
         )
-        mix = Audio.stereo_to_mono(data)
+        mono = Audio.stereo_to_mono(data)
 
         with wave.open(output, mode="wb") as rv:
             rv.setparams(wav.getparams())
@@ -85,11 +85,11 @@ class Audio:
                             byteorder="little",
                             signed=True
                         )
-                        for i in mix
+                        for i in mono
                     )
                 )
             except OverflowError as e:
-                print(min(mix))
-                print(max(mix))
+                print(min(mono))
+                print(max(mono))
                 raise
             return rv

@@ -59,5 +59,4 @@ class ConversionTests(unittest.TestCase):
         )
         with wave.open(stereo, "rb") as data:
             rv = Audio.wav_to_mono(data, "test.wav")
-
-        self.fail()
+            self.assertEqual(1, rv.getnchannels())
