@@ -26,7 +26,8 @@ class ConversionTests(unittest.TestCase):
 
     def test_read_samples(self):
         stereoFP  = pkg_resources.resource_filename(
-            "volcasample.test", "data/380_gunshot_single-mike-koenig-short.wav"
+            "volcasample.test",
+            "data/380_gunshot_single-mike-koenig-short.wav"
         )
 
         wav, data = ConversionTests.extract_wav_data(stereoFP)
@@ -37,7 +38,8 @@ class ConversionTests(unittest.TestCase):
 
     def test_find_peaks(self):
         stereoFP  = pkg_resources.resource_filename(
-            "volcasample.test", "data/380_gunshot_single-mike-koenig-short.wav"
+            "volcasample.test",
+            "data/380_gunshot_single-mike-koenig-short.wav"
         )
 
         wav, data = ConversionTests.extract_wav_data(stereoFP)
@@ -55,7 +57,8 @@ class ConversionTests(unittest.TestCase):
 
     def test_wav_to_mono(self):
         stereo  = pkg_resources.resource_filename(
-            "volcasample.test", "data/380_gunshot_single-mike-koenig-short.wav"
+            "volcasample.test",
+            "data/380_gunshot_single-mike-koenig-short.wav"
         )
         with wave.open(stereo, "rb") as data:
             rv = Audio.wav_to_mono(data, "test.wav")

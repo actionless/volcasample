@@ -52,26 +52,26 @@ def add_project_options(parser):
     )
     parser.add_argument(
         "--preview", action="store_true", default=False,
-        help="Play the sample file(s) from the project."
+        help="Play the audio file(s) from the project."
     )
     parser.add_argument(
         "--vote", required=False, type=str,
         help=(
-            "Change your vote on a sample. "
+            "Change your vote on an audio file. "
             "Use +1, -1 to adjust the vote up or down. "
             "Otherwise supply a digit as the vote value."
         )
     )
     return parser
 
-def add_sample_options(parser):
+def add_audio_options(parser):
     parser.add_argument(
         "--delete", action="store_true", default=False,
-        help="Delete original sample file after successful conversion."
+        help="Delete original audio file after successful conversion."
     )
     parser.add_argument(
-        "samples", nargs="*",
-        help="Specify one or more sample files."
+        "audio", nargs="*",
+        help="Specify one or more audio files."
     )
     return parser
 
@@ -96,9 +96,9 @@ def parsers(description=__doc__):
     p = add_project_options(p)
 
     p = subparsers.add_parser(
-        "sample",
-        help="Volca Sample 'sample' command.",
-        description="Operates on sample files."
+        "audio",
+        help="Volca Sample 'audio' command.",
+        description="Operates on audio files."
     )
-    p = add_sample_options(p)
+    p = add_audio_options(p)
     return (rv, subparsers)
