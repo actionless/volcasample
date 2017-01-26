@@ -12,6 +12,7 @@ import wave
 import volcasample
 import volcasample.cli
 import volcasample.project
+from volcasample.audio import Audio
 
 __doc__ = """
 This module provides a workflow for a Volca Sample project.
@@ -22,8 +23,8 @@ def main(args):
     if args.command == "sample":
         for path in args.samples:
             w = wave.open(path, "rb")
-            metadata = w.getparams()
-            print(volcasample.project.wav_json(metadata, path=os.path.abspath(path)))
+            params = w.getparams()
+            print(Audio.metadata(params, path=os.path.abspath(path)))
     elif args.command == "project":
         if args.new:
             volcasample.project.Project.create(
