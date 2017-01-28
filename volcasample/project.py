@@ -18,8 +18,10 @@ This module provides a workflow for a Volca Sample project.
 class Project:
 
     @staticmethod
-    def progress_point(n=None, clear=2):
-        if isinstance(n, int):
+    def progress_point(n=None, clear=2, quiet=False):
+        if quiet:
+            return
+        elif isinstance(n, int):
             msg = "." if n % 10 else n // 10
             end = ""
         elif n is None:
@@ -31,17 +33,18 @@ class Project:
         print(msg, end=end, file=sys.stderr, flush=True)
 
     @staticmethod
-    def create(path, start=0, stop=99):
+    def create(path, start=0, stop=99, quiet=False):
         Project.progress_point(
-            "Creating project tree at {0}".format(path)
+            "Creating project tree at {0}".format(path),
+            quiet=quiet
         )
         for i in range(start, stop + 1):
             os.makedirs(
                 os.path.join(path, "{0:02}".format(i)),
                 exist_ok=True,
             )
-            Project.progress_point(i)
-        Project.progress_point()
+            Project.progress_point(i, quiet=quiet)
+        Project.progress_point(quiet=quiet)
 
     @staticmethod
     def refresh(path):
