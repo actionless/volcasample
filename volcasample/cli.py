@@ -60,6 +60,13 @@ def add_project_options(parser):
         help="Play the audio file(s) from the project."
     )
     parser.add_argument(
+        "--check", action="store_true", default=False,
+        help=(
+            "Check the audio file(s) can be loaded to the Volca. "
+            "This command coverts stereo files to mono if necessary."
+        )
+    )
+    parser.add_argument(
         "--vote", required=False, type=str,
         help=(
             "Change your vote on an audio file. "

@@ -110,3 +110,10 @@ class ProjectVoteTests(CopiesTestData, unittest.TestCase):
         rv = list(Project.vote(self.drcty.name, incr=-2, start=0, span=2, quiet=True))
         self.assertTrue(all(i["vote"] == 16470 for i in rv))
         self.assertEqual(2, len(rv))
+
+class ProjectCheckTests(CopiesTestData, unittest.TestCase):
+
+    def test_check_single_slot(self):
+        rv = next(Project.check(self.drcty.name, start=0, span=1, quiet=True))
+        self.assertEqual(1, rv["nchannels"])
+        self.assertTrue(os.path.isfile(os.path.join(os.path.splitext(rv["path"])[0] + ".ref")))

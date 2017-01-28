@@ -71,6 +71,12 @@ def main(args):
                         start=args.start,
                         span=args.span
                     ))
+        elif args.check:
+            list(volcasample.project.Project.check(
+                args.project,
+                start=args.start,
+                span=args.span
+            ))
     return 0
 
 def run():

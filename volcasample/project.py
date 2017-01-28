@@ -102,3 +102,19 @@ class Project:
                 json.dump(tgt, new, indent=0, sort_keys=True)
 
             yield tgt
+
+    @staticmethod
+    def check(path, start=0, span=None, quiet=False):
+        tgts = list(Project.refresh(path, start, span, quiet=True))
+        for tgt in tgts:
+            n = int(os.path.basename(os.path.dirname(tgt["path"])))
+            if tgt["nchannels"] > 1:
+                fP = os.path.splitext(tgt["path"])[0] + ".ref"
+                os.replace(tgt["path"], fP)
+                with wave.open(fP, "rb") as wav:
+                    Audio.wav_to_mono(wav, tgt["path"])
+
+            yield next(Project.refresh(path, n, span=1, quiet=True))
+            Project.progress_point(n, quiet=quiet)
+        Project.progress_point(quiet=quiet)
+
