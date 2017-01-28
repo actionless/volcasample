@@ -2,6 +2,7 @@
 # encoding: UTF-8
 
 import argparse
+from collections import Counter
 from collections import OrderedDict
 import json
 import glob
@@ -38,6 +39,38 @@ def main(args):
                 start=args.start,
                 span=args.span
             ))
+        elif args.vote:
+            try:
+                val = int(args.vote)
+            except ValueError:
+                stats = Counter(
+                    i["vote"] for i in volcasample.project.Project.vote(
+                        args.project,
+                        start=args.start,
+                        span=args.span,
+                        quiet=True
+                    )
+                )
+                print("Vote value    Total", file=sys.stderr)
+                print(
+                    *["{0: 10}     {1:02}".format(val, stats[val]) for val in sorted(stats.keys())],
+                    file=sys.stdout
+                )
+            else:
+                if args.vote[0] in "+-":
+                    list(volcasample.project.Project.vote(
+                        args.project,
+                        incr=val,
+                        start=args.start,
+                        span=args.span
+                    ))
+                else:
+                    list(volcasample.project.Project.vote(
+                        args.project,
+                        val=val,
+                        start=args.start,
+                        span=args.span
+                    ))
     return 0
 
 def run():

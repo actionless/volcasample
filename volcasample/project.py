@@ -76,7 +76,7 @@ class Project:
             Project.progress_point(n, quiet=quiet)
 
             with open(fP, "w") as new:
-                json.dump(history, new, indent=0)
+                json.dump(history, new, indent=0, sort_keys=True)
 
             yield history
         Project.progress_point(quiet=quiet)
@@ -88,15 +88,17 @@ class Project:
         for tgt in tgts:
             tgt["vote"] = val if isinstance(val, int) else tgt["vote"] + incr
             Project.progress_point(
-                "{0} vote {1}. Value is {2}".format(
+                "{0} vote{1} for slot {2}. Value is {3}".format(
                     "Checked" if not (val or incr) else "Applied",
-                    "increment" if val is None and incr else "", tgt["vote"]
+                    " increment" if val is None and incr else "",
+                    os.path.basename(os.path.dirname(tgt["path"])),
+                    tgt["vote"]
                 ),
                 quiet=quiet
             )
 
             metadata = os.path.join(os.path.dirname(tgt["path"]), "metadata.json")
             with open(metadata, "w") as new:
-                json.dump(tgt, new, indent=0)
+                json.dump(tgt, new, indent=0, sort_keys=True)
 
             yield tgt
