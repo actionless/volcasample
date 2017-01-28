@@ -33,12 +33,13 @@ class Project:
         print(msg, end=end, file=sys.stderr, flush=True)
 
     @staticmethod
-    def create(path, start=0, stop=99, quiet=False):
+    def create(path, start=0, span=None, quiet=False):
+        stop = min(100, (start + span) if span is not None else 101)
         Project.progress_point(
             "Creating project tree at {0}".format(path),
             quiet=quiet
         )
-        for i in range(start, stop + 1):
+        for i in range(start, stop):
             os.makedirs(
                 os.path.join(path, "{0:02}".format(i)),
                 exist_ok=True,
@@ -48,12 +49,14 @@ class Project:
         return len(os.listdir(path))
 
     @staticmethod
-    def refresh(path, quiet=False):
+    def refresh(path, start=0, span=None, quiet=False):
+        stop = min(100, (start + span) if span is not None else 101)
         Project.progress_point(
             "Refreshing project at {0}".format(path),
             quiet=quiet
         )
-        for tgt in glob.glob(os.path.join(path, "??", "*.wav")):
+        tgts =  sorted(glob.glob(os.path.join(path, "??", "*.wav")))
+        for tgt in tgts[start:stop]:
             w = wave.open(tgt, "rb")
             params = w.getparams()
             metadata = Audio.metadata(params, tgt)
