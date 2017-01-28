@@ -30,10 +30,14 @@ def main(args):
             volcasample.project.Project.create(
                 args.project,
                 start=args.start,
-                stop=args.stop or 99
+                span=args.span
             )
         elif args.refresh:
-            volcasample.project.Project.refresh(args.project)
+            list(volcasample.project.Project.refresh(
+                args.project,
+                start=args.start,
+                span=args.span
+            ))
     return 0
 
 def run():

@@ -26,7 +26,7 @@ class Project:
             end = ""
         elif n is None:
             end = "\n" * clear
-            msg = " Done."
+            msg = " OK."
         else:
             msg = n
             end = "\n" * clear
@@ -57,6 +57,7 @@ class Project:
         )
         tgts =  sorted(glob.glob(os.path.join(path, "??", "*.wav")))
         for tgt in tgts[start:stop]:
+            n = int(os.path.basename(os.path.dirname(tgt)))
             w = wave.open(tgt, "rb")
             params = w.getparams()
             metadata = Audio.metadata(params, tgt)
@@ -72,12 +73,13 @@ class Project:
                 history = OrderedDict([("vote", 0)])
 
             history.update(metadata)
-            Project.progress_point(history, quiet=quiet)
+            Project.progress_point(n, quiet=quiet)
 
             with open(fP, "w") as new:
                 json.dump(history, new, indent=0)
 
             yield history
+        Project.progress_point(quiet=quiet)
 
     @staticmethod
     def vote(path, val=None, incr=0, start=0, span=None, quiet=False):
@@ -85,6 +87,13 @@ class Project:
 
         for tgt in tgts:
             tgt["vote"] = val if isinstance(val, int) else tgt["vote"] + incr
+            Project.progress_point(
+                "{0} vote {1}. Value is {2}".format(
+                    "Checked" if not (val or incr) else "Applied",
+                    "increment" if val is None and incr else "", tgt["vote"]
+                ),
+                quiet=quiet
+            )
 
             metadata = os.path.join(os.path.dirname(tgt["path"]), "metadata.json")
             with open(metadata, "w") as new:

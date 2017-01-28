@@ -34,21 +34,22 @@ def add_common_options(parser):
 
 def add_project_options(parser):
     parser.add_argument(
-        "--new", action="store_true", required=False,
+        "--new", action="store_true", default=False,
         help="Create a new project."
     )
     parser.add_argument(
         "--project", default=DFLT_LOCN,
-        help="path to project directory [{}]".format(DFLT_LOCN))
+        help="path to project directory [{}]".format(DFLT_LOCN)
+    )
     parser.add_argument(
         "--start", required=False,
         type=int, choices=range(0, 100), default=0,
         help="Select the project index to begin at."
     )
     parser.add_argument(
-        "--stop", required=False,
-        type=int, choices=range(0, 100), default=0,
-        help="Select the project index to end on."
+        "--span", required=False,
+        type=int, choices=range(0, 100), default=None,
+        help="Select the number of slots to operate on."
     )
     parser.add_argument(
         "--refresh", action="store_true", default=False,
