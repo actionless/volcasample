@@ -78,3 +78,16 @@ class Project:
                 json.dump(history, new, indent=0)
 
             yield history
+
+    @staticmethod
+    def vote(path, val=None, incr=0, start=0, span=None, quiet=False):
+        tgts = list(Project.refresh(path, start, span, quiet))
+
+        for tgt in tgts:
+            tgt["vote"] = val if isinstance(val, int) else tgt["vote"] + incr
+
+            metadata = os.path.join(os.path.dirname(tgt["path"]), "metadata.json")
+            with open(metadata, "w") as new:
+                json.dump(tgt, new, indent=0)
+
+            yield tgt
