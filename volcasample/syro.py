@@ -93,14 +93,14 @@ class SyroData(ctypes.Structure):
         ("Size", ctypes.c_uint),
         ("Quality", ctypes.c_uint),
         ("Fs", ctypes.c_uint),
-        ("Endian", ctypes.c_uint),
+        ("SampleEndian", ctypes.c_uint),
     ]
 
-def get_comp_size(lib=None):
+def get_frame_size_sample_comp(data, lib=None):
     lib = lib or pick_lib()
-    fn = lib.SyroComp_GetCompSize
-    fn.argtypes = [ctypes.POINTER(ctypes.c_ushort)]
+    fn = lib.SyroComp_GetFrameSize_Sample_Comp
+    fn.argtypes = [POINTER(SyroData)]
     fn.errcheck = check
-    rv = fn()
+    rv = fn(data)
     return rv
 

@@ -5,7 +5,7 @@ import ctypes
 import unittest
 
 import volcasample.syro
-from volcasample.syro import get_comp_size
+from volcasample.syro import get_frame_size_sample_comp
 from volcasample.syro import pick_lib
 
 
@@ -93,6 +93,5 @@ class SyroTypeTests(unittest.TestCase):
 
 class SyroCompTests(unittest.TestCase):
 
-    def test_GetCompSize(self):
-        self.fail()
-        get_comp_size()
+    def test_GetFrameSizeSampleComp(self):
+        get_frame_size_sample_comp()
