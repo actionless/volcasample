@@ -53,6 +53,44 @@ class SyroTypeTests(unittest.TestCase):
             volcasample.syro.DataType.Pattern.value.value
         )
 
+    def test_status(self):
+        self.assertEqual(
+            0,
+            volcasample.syro.Status.Success.value.value
+        )
+        self.assertEqual(
+            1,
+            volcasample.syro.Status.IllegalDataType.value.value
+        )
+        self.assertEqual(
+            2,
+            volcasample.syro.Status.IllegalData.value.value
+        )
+        self.assertEqual(
+            3,
+            volcasample.syro.Status.IllegalParameter.value.value
+        )
+        self.assertEqual(
+            4,
+            volcasample.syro.Status.OutOfRange_Number.value.value
+        )
+        self.assertEqual(
+            5,
+            volcasample.syro.Status.OutOfRange_Quality.value.value
+        )
+        self.assertEqual(
+            6,
+            volcasample.syro.Status.NotEnoughMemory.value.value
+        )
+        self.assertEqual(
+            7,
+            volcasample.syro.Status.InvalidHandle.value.value
+        )
+        self.assertEqual(
+            8,
+            volcasample.syro.Status.NoData.value.value
+        )
+
 class SyroCompTests(unittest.TestCase):
 
     def test_GetCompSize(self):

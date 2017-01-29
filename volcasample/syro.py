@@ -58,6 +58,18 @@ class DataType(enum.Enum):
     Sample_AllCompress = ctypes.c_uint(4)
     Pattern = ctypes.c_uint(5)
 
+@enum.unique
+class Status(enum.Enum):
+    Success = ctypes.c_uint(0)
+    IllegalDataType = ctypes.c_uint(1)
+    IllegalData = ctypes.c_uint(2)
+    IllegalParameter = ctypes.c_uint(3)
+    OutOfRange_Number = ctypes.c_uint(4)
+    OutOfRange_Quality = ctypes.c_uint(5)
+    NotEnoughMemory = ctypes.c_uint(6)
+    InvalidHandle = ctypes.c_uint(7)
+    NoData = ctypes.c_uint(8)
+
 """
 typedef struct {
     SyroDataType DataType;
