@@ -41,7 +41,7 @@ setup(
     ],
     packages=[
         "volcasample",
-        #"volcasample.test",
+        "volcasample.test",
     ],
     package_data={
         "volcasample": [

@@ -477,7 +477,7 @@ static uint32_t SyroVolcaSample_GetFrameSize_Sample(uint32_t byte_size)
 /*-----------------------------------------------------------------------
 	Get Frame Size (Sample, Compress)
  -----------------------------------------------------------------------*/
-static uint32_t SyroVolcaSample_GetFrameSize_Sample_Comp(SyroData *pdata)
+uint32_t SyroVolcaSample_GetFrameSize_Sample_Comp(SyroData *pdata)
 {
 	uint32_t size, comp_size;
 	uint32_t num_of_block;

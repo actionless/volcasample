@@ -71,6 +71,7 @@ SyroStatus SyroVolcaSample_GetSample(SyroHandle Handle, int16_t *pLeft, int16_t 
 
 SyroStatus SyroVolcaSample_End(SyroHandle Handle);
 
+uint32_t SyroVolcaSample_GetFrameSize_Sample_Comp(SyroData *pdata);
 #ifdef __cplusplus
 }
 #endif

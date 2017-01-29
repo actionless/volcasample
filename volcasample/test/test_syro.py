@@ -94,4 +94,14 @@ class SyroTypeTests(unittest.TestCase):
 class SyroCompTests(unittest.TestCase):
 
     def test_GetFrameSizeSampleComp(self):
-        get_frame_size_sample_comp()
+        buf = (ctypes.c_ubyte * 1024)()
+        data = volcasample.syro.SyroData(
+            volcasample.syro.DataType.Sample_Liner.value.value,
+            buf,
+            0,
+            1024,
+            16,
+            44100,
+            volcasample.syro.Endian.LittleEndian.value.value,
+        )
+        self.fail(get_frame_size_sample_comp(data))

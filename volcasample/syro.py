@@ -98,8 +98,8 @@ class SyroData(ctypes.Structure):
 
 def get_frame_size_sample_comp(data, lib=None):
     lib = lib or pick_lib()
-    fn = lib.SyroComp_GetFrameSize_Sample_Comp
-    fn.argtypes = [POINTER(SyroData)]
+    fn = lib.SyroVolcaSample_GetFrameSize_Sample_Comp
+    fn.argtypes = [ctypes.POINTER(SyroData)]
     fn.errcheck = check
     rv = fn(data)
     return rv
