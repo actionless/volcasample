@@ -49,6 +49,41 @@ class Endian(enum.Enum):
     LittleEndian = ctypes.c_uint(0)
     BigEndian = ctypes.c_uint(1)
 
+@enum.unique
+class DataType(enum.Enum):
+    Sample_Liner = ctypes.c_uint(0)
+    Sample_Compress = ctypes.c_uint(1)
+    Sample_Erase = ctypes.c_uint(2)
+    Sample_All = ctypes.c_uint(3)
+    Sample_AllCompress = ctypes.c_uint(4)
+    Pattern = ctypes.c_uint(5)
+
+"""
+typedef struct {
+    SyroDataType DataType;
+    uint8_t *pData;
+    uint32_t Number;		// Sample:0-99, Pattern:0-9
+    uint32_t Size;			// Byte Size (if type=Sample)
+    uint32_t Quality;		// specific Sample bit (8-16), if type=LossLess
+	uint32_t Fs;
+	Endian SampleEndian;
+} SyroData;
+"""
+
+Handle = ctypes.c_void_p
+
+class SyroData(ctypes.Structure):
+
+    _fields_  = [
+        ("DataType", ctypes.c_uint),
+        ("pData", ctypes.POINTER(ctypes.c_ubyte)),
+        ("Number", ctypes.c_uint),
+        ("Size", ctypes.c_uint),
+        ("Quality", ctypes.c_uint),
+        ("Fs", ctypes.c_uint),
+        ("Endian", ctypes.c_uint),
+    ]
+
 def get_comp_size(lib=None):
     lib = lib or pick_lib()
     fn = lib.SyroComp_GetCompSize

@@ -27,6 +27,32 @@ class SyroTypeTests(unittest.TestCase):
             volcasample.syro.Endian.BigEndian.value.value
         )
 
+    def test_datatype(self):
+        self.assertEqual(
+            0,
+            volcasample.syro.DataType.Sample_Liner.value.value
+        )
+        self.assertEqual(
+            1,
+            volcasample.syro.DataType.Sample_Compress.value.value
+        )
+        self.assertEqual(
+            2,
+            volcasample.syro.DataType.Sample_Erase.value.value
+        )
+        self.assertEqual(
+            3,
+            volcasample.syro.DataType.Sample_All.value.value
+        )
+        self.assertEqual(
+            4,
+            volcasample.syro.DataType.Sample_AllCompress.value.value
+        )
+        self.assertEqual(
+            5,
+            volcasample.syro.DataType.Pattern.value.value
+        )
+
 class SyroCompTests(unittest.TestCase):
 
     def test_GetCompSize(self):
