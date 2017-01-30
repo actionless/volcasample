@@ -67,18 +67,6 @@ class Status(enum.Enum):
     InvalidHandle = ctypes.c_uint(7)
     NoData = ctypes.c_uint(8)
 
-"""
-typedef struct {
-    SyroDataType DataType;
-    uint8_t *pData;
-    uint32_t Number;		// Sample:0-99, Pattern:0-9
-    uint32_t Size;			// Byte Size (if type=Sample)
-    uint32_t Quality;		// specific Sample bit (8-16), if type=LossLess
-	uint32_t Fs;
-	Endian SampleEndian;
-} SyroData;
-"""
-
 Handle = ctypes.c_void_p
 
 class SyroData(ctypes.Structure):
@@ -92,6 +80,24 @@ class SyroData(ctypes.Structure):
         ("Fs", ctypes.c_uint),
         ("SampleEndian", ctypes.c_uint),
     ]
+
+class SamplePacker:
+
+    @staticmethod
+    def start(nSamples=100, lib=None):
+        lib = lib or pick_lib()
+        rv = Handle()
+        buf = (SyroData * nSamples)
+        flags = 0
+        fn = lib.SyroVolcaSample_Start
+        fn.argtypes = [
+            Handle,
+            ctypes.POINTER(SyroData),
+            ctypes.c_int,
+            ctypes.c_uint,
+            ctypes.POINTER(ctypes.c_uint)
+        ]
+        return fn
 
 def get_frame_size_sample_comp(data, lib=None):
 

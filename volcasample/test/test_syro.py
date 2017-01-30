@@ -105,3 +105,10 @@ class SyroCompTests(unittest.TestCase):
             volcasample.syro.Endian.LittleEndian.value.value,
         )
         self.assertEqual(91208, get_frame_size_sample_comp(data))
+
+class SamplePackerTests(unittest.TestCase):
+
+    def test_start(self):
+        obj = volcasample.syro.SamplePacker.start()
+        self.fail(obj)
+
