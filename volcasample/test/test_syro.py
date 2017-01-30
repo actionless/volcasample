@@ -91,17 +91,17 @@ class SyroTypeTests(unittest.TestCase):
             volcasample.syro.Status.NoData.value.value
         )
 
+@unittest.skip("exposing static internal function for sanity check")
 class SyroCompTests(unittest.TestCase):
 
     def test_GetFrameSizeSampleComp(self):
         buf = (ctypes.c_ubyte * 1024)()
+        nBits = 16
+        freqS = 44100
+        qam = 16
         data = volcasample.syro.SyroData(
             volcasample.syro.DataType.Sample_Liner.value.value,
-            buf,
-            0,
-            1024,
-            16,
-            44100,
+            buf, 0, len(buf), nBits, freqS,
             volcasample.syro.Endian.LittleEndian.value.value,
         )
-        self.fail(get_frame_size_sample_comp(data))
+        self.assertEqual(91208, get_frame_size_sample_comp(data))

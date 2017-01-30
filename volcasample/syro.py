@@ -41,9 +41,6 @@ def lib_paths(pkg="volcasample", locn="lib"):
 def pick_lib(pkg="volcasample", locn="lib"):
     return ctypes.cdll.LoadLibrary(next(lib_paths(pkg, locn)))
 
-def check(result, fn, args):
-    print(result, fn, args)
-
 @enum.unique
 class Endian(enum.Enum):
     LittleEndian = ctypes.c_uint(0)
@@ -97,9 +94,14 @@ class SyroData(ctypes.Structure):
     ]
 
 def get_frame_size_sample_comp(data, lib=None):
+
+    def check(result, fn, args):
+        return result
+
     lib = lib or pick_lib()
     fn = lib.SyroVolcaSample_GetFrameSize_Sample_Comp
     fn.argtypes = [ctypes.POINTER(SyroData)]
+    fn.restype = ctypes.c_uint
     fn.errcheck = check
     rv = fn(data)
     return rv
