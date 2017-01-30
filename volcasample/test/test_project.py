@@ -28,7 +28,10 @@ class CopiesTestData(NeedsTempDirectory):
         super().setUp()
         self.assertEqual(2, Project.create(self.drcty.name, start=0, span=2, quiet=True))
         data = pkg_resources.resource_filename("volcasample.test", "data")
-        for src, dst in zip(sorted(os.listdir(data)), ("00", "01")):
+        for src, dst in zip(
+            sorted(i for i in os.listdir(data) if i.endswith(".wav")),
+            ("00", "01")
+        ):
             rv = shutil.copy(os.path.join(data, src), os.path.join(self.drcty.name, dst))
 
 class ProjectCreateTests(NeedsTempDirectory, unittest.TestCase):

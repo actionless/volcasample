@@ -114,7 +114,7 @@ class Project:
                 with wave.open(fP, "rb") as wav:
                     Audio.wav_to_mono(wav, tgt["path"])
 
-            yield next(Project.refresh(path, n, span=1, quiet=True))
+            yield from Project.refresh(path, n, span=1, quiet=True)
             Project.progress_point(n, quiet=quiet)
         Project.progress_point(quiet=quiet)
 
