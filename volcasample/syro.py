@@ -85,6 +85,13 @@ class SamplePacker:
 
     @staticmethod
     def start(handle, nSamples=100, lib=None):
+
+        def check(result, fn, args):
+            return next(
+                (i for i in Status if i.value.value == result),
+                None
+            )
+
         lib = lib or pick_lib()
         handle = Handle()
         buf = (SyroData * nSamples)()
@@ -98,6 +105,7 @@ class SamplePacker:
             ctypes.c_uint,
             ctypes.POINTER(ctypes.c_uint)
         ]
+        fn.errcheck = check
         return fn(
             ctypes.byref(handle),
             buf,
@@ -108,12 +116,18 @@ class SamplePacker:
 
     @staticmethod
     def end(handle, lib=None):
+
+        def check(result, fn, args):
+            return next(
+                (i for i in Status if i.value.value == result),
+                None
+            )
+
         lib = lib or pick_lib()
         fn = lib.SyroVolcaSample_End
         fn.argtypes = [ctypes.POINTER(Handle)]
-        fn.restype = ctypes.c_uint
-        rv = fn(handle)
-        return rv
+        fn.errcheck = check
+        return fn(handle)
 
 def get_frame_size_sample_comp(data, lib=None):
 
