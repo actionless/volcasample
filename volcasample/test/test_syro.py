@@ -109,6 +109,13 @@ class SyroCompTests(unittest.TestCase):
 class SamplePackerTests(unittest.TestCase):
 
     def test_start(self):
-        obj = volcasample.syro.SamplePacker.start()
-        self.fail(obj)
+        handle = volcasample.syro.Handle()
+        status = volcasample.syro.SamplePacker.start(handle)
+        self.fail(status)
+
+    def test_end(self):
+        handle = volcasample.syro.Handle()
+        status = volcasample.syro.SamplePacker.start(handle)
+        status = volcasample.syro.SamplePacker.end(handle)
+        self.fail(status)
 

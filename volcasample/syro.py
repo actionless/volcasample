@@ -84,20 +84,36 @@ class SyroData(ctypes.Structure):
 class SamplePacker:
 
     @staticmethod
-    def start(nSamples=100, lib=None):
+    def start(handle, nSamples=100, lib=None):
         lib = lib or pick_lib()
-        rv = Handle()
-        buf = (SyroData * nSamples)
+        handle = Handle()
+        buf = (SyroData * nSamples)()
         flags = 0
+        nFrame = ctypes.c_uint()
         fn = lib.SyroVolcaSample_Start
         fn.argtypes = [
-            Handle,
+            ctypes.POINTER(Handle),
             ctypes.POINTER(SyroData),
             ctypes.c_int,
             ctypes.c_uint,
             ctypes.POINTER(ctypes.c_uint)
         ]
-        return fn
+        return fn(
+            ctypes.byref(handle),
+            buf,
+            nSamples,
+            0,
+            ctypes.byref(nFrame)
+        )
+
+    @staticmethod
+    def end(handle, lib=None):
+        lib = lib or pick_lib()
+        fn = lib.SyroVolcaSample_End
+        fn.argtypes = [ctypes.POINTER(Handle)]
+        fn.restype = ctypes.c_uint
+        rv = fn(handle)
+        return rv
 
 def get_frame_size_sample_comp(data, lib=None):
 
