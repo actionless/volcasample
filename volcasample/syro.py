@@ -6,30 +6,7 @@ import enum
 import os.path
 import pkg_resources
 
-"""
-korg_syro_volcasample_example:
-
-    See analyze_commandline for modes of operation.
-
-	SyroData syro_data[MAX_SYRO_DATA];
-	SyroStatus status;
-	SyroHandle handle;
-"""
-"""
-
-korg_syro_volcasample:
-
-SyroStatus SyroVolcaSample_Start(SyroHandle *pHandle, SyroData *pData, int NumOfData,
-	uint32_t Flags, uint32_t *pNumOfSyroFrame)
-
-"""
-"""
-uint32_t SyroComp_GetCompSize(const uint8_t *psrc, uint32_t num_of_sample,
-	uint32_t quality, Endian sample_endian);
-
-uint32_t SyroComp_Comp(const uint8_t *psrc, uint8_t *pdest, int num_of_sample, 
-	int quality, Endian sample_endian);
-"""
+# TODO: See korg_syro_volcasample_example setup_file_sample
 
 def lib_paths(pkg="volcasample", locn="lib"):
     dirPath = pkg_resources.resource_filename(pkg, locn)
