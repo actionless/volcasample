@@ -10,6 +10,7 @@ import sys
 import wave
 
 from volcasample.audio import Audio
+import volcasample.syro
 
 __doc__ = """
 This module provides a workflow for a Volca Sample project.
@@ -135,7 +136,12 @@ class Project:
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
+        self._handle = None
+        self._assets = None
         return False
 
     def assemble(self, vote=0):
-        print(vote)
+        self._handle = volcasample.syro.Handle()
+        status = volcasample.syro.SamplePacker.start(self._handle)
+        status = volcasample.syro.SamplePacker.end(self._handle)
+        print(status)
