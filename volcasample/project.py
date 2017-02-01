@@ -2,6 +2,7 @@
 # encoding: UTF-8
 
 from collections import OrderedDict
+from collections import namedtuple
 import glob
 import json
 import os
@@ -16,6 +17,8 @@ This module provides a workflow for a Volca Sample project.
 """
 
 class Project:
+
+    Asset = namedtuple("Asset", ["metadata", "data"])
 
     @staticmethod
     def progress_point(n=None, clear=2, quiet=False):
@@ -121,11 +124,14 @@ class Project:
     def __init__(self,path,  start, span):
         self.path, self.start, self.span = path, start, span
         self._handle = None
+        self._assets = None
 
     def __enter__(self):
+        self._assets = []
         for metadata in self.check(self.path, self.start, self.span):
-            print(metadata)
-        # Read data into memory 
+            with open(metadata["path"], "r+b") as src:
+                data = src.read()
+                self._assets.append(Project.Asset(metadata, data))
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
