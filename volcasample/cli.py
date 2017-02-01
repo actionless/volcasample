@@ -67,6 +67,11 @@ def add_project_options(parser):
         )
     )
     parser.add_argument(
+        "--assemble", action="store_true", default=False,
+        help="Create an upload file for the Volca."
+        
+    )
+    parser.add_argument(
         "--vote", required=False, type=str,
         help=(
             "Change your vote on an audio file. "

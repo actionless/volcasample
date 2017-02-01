@@ -12,8 +12,8 @@ import wave
 
 import volcasample
 import volcasample.cli
-import volcasample.project
 from volcasample.audio import Audio
+from volcasample.project import Project
 
 __doc__ = """
 This module provides a workflow for a Volca Sample project.
@@ -27,14 +27,19 @@ def main(args):
             params = w.getparams()
             print(Audio.metadata(params, path=os.path.abspath(path)))
     elif args.command == "project":
-        if args.new:
-            volcasample.project.Project.create(
+        if args.assemble:
+            with Project(args.project, args.start, args.span) as proj:
+                proj.assemble(args.vote)
+
+        elif args.new:
+            # TODO: ingest from CLI args
+            Project.create(
                 args.project,
                 start=args.start,
                 span=args.span
             )
         elif args.refresh:
-            list(volcasample.project.Project.refresh(
+            list(Project.refresh(
                 args.project,
                 start=args.start,
                 span=args.span
@@ -44,7 +49,7 @@ def main(args):
                 val = int(args.vote)
             except ValueError:
                 stats = Counter(
-                    i["vote"] for i in volcasample.project.Project.vote(
+                    i["vote"] for i in Project.vote(
                         args.project,
                         start=args.start,
                         span=args.span,
@@ -58,21 +63,21 @@ def main(args):
                 )
             else:
                 if args.vote[0] in "+-":
-                    list(volcasample.project.Project.vote(
+                    list(Project.vote(
                         args.project,
                         incr=val,
                         start=args.start,
                         span=args.span
                     ))
                 else:
-                    list(volcasample.project.Project.vote(
+                    list(Project.vote(
                         args.project,
                         val=val,
                         start=args.start,
                         span=args.span
                     ))
         elif args.check:
-            list(volcasample.project.Project.check(
+            list(Project.check(
                 args.project,
                 start=args.start,
                 span=args.span

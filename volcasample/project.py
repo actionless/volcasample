@@ -118,3 +118,18 @@ class Project:
             Project.progress_point(n, quiet=quiet)
         Project.progress_point(quiet=quiet)
 
+    def __init__(self,path,  start, span):
+        self.path, self.start, self.span = path, start, span
+        self._handle = None
+
+    def __enter__(self):
+        for metadata in self.check(self.path, self.start, self.span):
+            print(metadata)
+        # Read data into memory 
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        return False
+
+    def assemble(self, vote=0):
+        print(vote)
