@@ -46,6 +46,9 @@ class Status(enum.Enum):
 
 Handle = ctypes.c_void_p
 
+# TODO: SyroVolcaSample_GetSample
+
+
 class SyroData(ctypes.Structure):
 
     _fields_  = [
