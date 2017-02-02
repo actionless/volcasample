@@ -63,7 +63,12 @@ class SyroData(ctypes.Structure):
 class SamplePacker:
 
     @staticmethod
-    def start(handle, nSamples=100, lib=None):
+    def build(assets):
+        data = (SyroData * len(assets))()
+        return data
+
+    @staticmethod
+    def start(handle, data, nSamples=100, lib=None):
 
         def check(result, fn, args):
             return next(
@@ -73,7 +78,6 @@ class SamplePacker:
 
         lib = lib or pick_lib()
         handle = Handle()
-        buf = (SyroData * nSamples)()
         flags = 0
         nFrame = ctypes.c_uint()
         fn = lib.SyroVolcaSample_Start
@@ -87,7 +91,7 @@ class SamplePacker:
         fn.errcheck = check
         return fn(
             ctypes.byref(handle),
-            buf,
+            ctypes.byref(data),
             nSamples,
             0,
             ctypes.byref(nFrame)

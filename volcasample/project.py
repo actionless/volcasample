@@ -141,10 +141,13 @@ class Project:
         return False
 
     def assemble(self, vote=0):
-        # TODO: Turn assets into syrodata
         self._handle = volcasample.syro.Handle()
+
+        patch = volcasample.syro.SamplePacker.build(self._assets)
+        # TODO: Get syrodata initialised to sample No-op
+        # TODO: Turn assets into syrodata
         # TODO: Pass syrodata into library
-        status = volcasample.syro.SamplePacker.start(self._handle)
+        status = volcasample.syro.SamplePacker.start(self._handle, None)
         # TODO: Iterate by get_sample over output data
         status = volcasample.syro.SamplePacker.end(self._handle)
         print(status)

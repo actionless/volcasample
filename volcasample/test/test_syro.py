@@ -7,6 +7,7 @@ import unittest
 import volcasample.syro
 from volcasample.syro import get_frame_size_sample_comp
 from volcasample.syro import pick_lib
+from volcasample.syro import SyroData
 
 
 class DiscoveryTests(unittest.TestCase):
@@ -110,12 +111,15 @@ class SamplePackerTests(unittest.TestCase):
 
     def test_start(self):
         handle = volcasample.syro.Handle()
-        status = volcasample.syro.SamplePacker.start(handle)
+        data = SyroData(0, handle, 1, 1, 16, 44100, 0)
+        status = volcasample.syro.SamplePacker.start(
+            handle, data[0]
+        )
         self.fail(status)
 
     def test_end(self):
         handle = volcasample.syro.Handle()
-        status = volcasample.syro.SamplePacker.start(handle)
+        status = volcasample.syro.SamplePacker.start(handle, None)
         status = volcasample.syro.SamplePacker.end(handle)
         self.fail(status)
 
