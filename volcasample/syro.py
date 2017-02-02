@@ -46,7 +46,6 @@ class Status(enum.Enum):
 
 Handle = ctypes.c_void_p
 
-# TODO: SyroVolcaSample_GetSample
 
 
 class SyroData(ctypes.Structure):
@@ -93,6 +92,18 @@ class SamplePacker:
             0,
             ctypes.byref(nFrame)
         )
+
+# TODO: SyroVolcaSample_GetSample
+    @staticmethod
+    def get_sample(handle, lib=None):
+
+        def check(result, fn, args):
+            return next(
+                (i for i in Status if i.value.value == result),
+                None
+            )
+
+        pass
 
     @staticmethod
     def end(handle, lib=None):

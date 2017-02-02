@@ -73,6 +73,7 @@ class Audio:
         data = Audio.extract_samples(
             raw, nChannels, bytesPerSample, nFrames
         )
+        # TODO: Convert to 16 bit
         mono = Audio.stereo_to_mono(data)
 
         with wave.open(output, mode="wb") as rv:

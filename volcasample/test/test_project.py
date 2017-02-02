@@ -120,3 +120,11 @@ class ProjectCheckTests(CopiesTestData, unittest.TestCase):
         rv = next(Project.check(self.drcty.name, start=0, span=1, quiet=True))
         self.assertEqual(1, rv["nchannels"])
         self.assertTrue(os.path.isfile(os.path.join(os.path.splitext(rv["path"])[0] + ".ref")))
+
+class ProjectAssembleTests(CopiesTestData, unittest.TestCase):
+
+    def test_assemble_single_slot(self):
+        with Project(self.drcty.name, 0, 1) as proj:
+            status = proj.assemble(vote=0)
+
+        print(status)
