@@ -4,6 +4,8 @@
 import ctypes
 import unittest
 
+import pkg_resources
+
 import volcasample.syro
 from volcasample.syro import get_frame_size_sample_comp
 from volcasample.syro import pick_lib
@@ -123,3 +125,13 @@ class SamplePackerTests(unittest.TestCase):
         status = volcasample.syro.SamplePacker.end(handle)
         self.fail(status)
 
+    def test_build(self):
+        patch = (SyroData * 100)()
+        sample = pkg_resources.resource_filename(
+            "volcasample.test", "data/pcm1608m.wav"
+        )
+        with open(sample, "r+b") as in_:
+            data = in_.read()
+        patch[0].pData.value = data
+        patch[0].Size = len(data)
+ 
