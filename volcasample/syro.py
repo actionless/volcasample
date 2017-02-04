@@ -124,7 +124,9 @@ class SamplePacker:
                 (i for i in Status if i.value.value == result),
                 None
             )
-            return status
+            if status is not Status.Success:
+                raise RuntimeWarning(status)
+            return tuple(i.contents.value for i in args[-2:])
 
         fn = SamplePacker.wrap_sample_fn()
         fn.errcheck = check
