@@ -86,14 +86,14 @@ class SamplePacker:
 
         lib = lib or pick_lib()
         flags = 0
-        nFrame = ctypes.c_uint()
+        nFrame = ctypes.c_uint32()
         fn = lib.SyroVolcaSample_Start
         fn.argtypes = [
             ctypes.POINTER(Handle),
             ctypes.POINTER(SyroData),
             ctypes.c_int,
             ctypes.c_uint,
-            ctypes.POINTER(ctypes.c_uint)
+            ctypes.POINTER(ctypes.c_uint32)
         ]
         fn.errcheck = check
         return fn(
@@ -109,7 +109,7 @@ class SamplePacker:
         lib = lib or pick_lib()
         fn = lib.SyroVolcaSample_GetSample
         fn.argtypes = [
-            ctypes.POINTER(Handle),
+            Handle,
             ctypes.POINTER(ctypes.c_uint16),
             ctypes.POINTER(ctypes.c_uint16),
         ]
@@ -126,12 +126,11 @@ class SamplePacker:
             )
             return status
 
-        lib = lib or pick_lib()
         fn = SamplePacker.wrap_sample_fn()
         fn.errcheck = check
         left = ctypes.c_uint16()
         right = ctypes.c_uint16()
-        return fn(ctypes.byref(handle), ctypes.pointer(left), ctypes.pointer(right))
+        return fn(handle, ctypes.pointer(left), ctypes.pointer(right))
 
     @staticmethod
     def end(handle, lib=None):

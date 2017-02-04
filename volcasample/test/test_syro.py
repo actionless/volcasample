@@ -189,10 +189,11 @@ class SamplePackerTests(unittest.TestCase):
         patch[0].DataType = DataType.Sample_Liner.value
         handle = Handle()
         nFrames = volcasample.syro.SamplePacker.start(handle, patch[0], 1)
-        #for i in range(nFrames):
-        #    rv = volcasample.syro.SamplePacker.get_sample(handle)
-        #    self.assertIsInstance(rv, tuple)
-        #    self.assertEqual(2, len(rv))
+        self.assertEqual(1342352, nFrames)
+        for i in range(nFrames):
+            rv = volcasample.syro.SamplePacker.get_sample(handle)
+            self.assertIsInstance(rv, tuple, msg=i)
+            self.assertEqual(2, len(rv))
         status = volcasample.syro.SamplePacker.end(handle)
         print(status)
 
