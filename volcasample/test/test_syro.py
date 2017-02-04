@@ -164,6 +164,7 @@ class SamplePackerTests(unittest.TestCase):
         patch[0].Number = 0
         patch[0].pData.value = data
         patch[0].Size = len(data)
+        patch[0].Quality = 16
         patch[0].Fs = 44100
         patch[0].SampleEndian = (
             Endian.LittleEndian.value if sys.byteorder == "little"

@@ -68,7 +68,8 @@ class SamplePacker:
         return data
 
     @staticmethod
-    def start(handle, data, nSamples=100, lib=None):
+    def start(handle, data, nEntries=100, lib=None):
+        assert 0 <= nEntries <= 110
 
         def check(result, fn, args):
             return next(
@@ -91,7 +92,7 @@ class SamplePacker:
         return fn(
             ctypes.byref(handle),
             ctypes.byref(data),
-            nSamples,
+            nEntries,
             0,
             ctypes.byref(nFrame)
         )
@@ -119,7 +120,7 @@ class SamplePacker:
 
         lib = lib or pick_lib()
         fn = lib.SyroVolcaSample_End
-        fn.argtypes = [ctypes.POINTER(Handle)]
+        fn.argtypes = [Handle]
         fn.errcheck = check
         return fn(handle)
 
