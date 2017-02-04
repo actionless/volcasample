@@ -166,7 +166,7 @@ class SamplePackerTests(unittest.TestCase):
         patch[0].Number = 1
         handle = Handle()
         nFrames = volcasample.syro.SamplePacker.start(handle, patch[0], 1)
-        self.assertIsInstance(nFrames, int)
+        self.assertEqual(104392, nFrames)
 
     @unittest.skip("Until....")
     def test_end(self):
@@ -190,10 +190,11 @@ class SamplePackerTests(unittest.TestCase):
         handle = Handle()
         nFrames = volcasample.syro.SamplePacker.start(handle, patch[0], 1)
         self.assertEqual(1342352, nFrames)
-        for i in range(nFrames):
-            rv = volcasample.syro.SamplePacker.get_sample(handle)
-            self.assertIsInstance(rv, tuple, msg=i)
-            self.assertEqual(2, len(rv))
+        #for i in range(nFrames):
+        #    print(i)
+        #    rv = volcasample.syro.SamplePacker.get_sample(handle)
+        #    self.assertIsInstance(rv, tuple, msg=i)
+        #    self.assertEqual(2, len(rv))
         status = volcasample.syro.SamplePacker.end(handle)
         print(status)
 

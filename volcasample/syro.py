@@ -53,10 +53,10 @@ class SyroData(ctypes.Structure):
     _fields_  = [
         ("DataType", ctypes.c_uint),
         ("pData", ctypes.POINTER(ctypes.c_ubyte)),
-        ("Number", ctypes.c_uint),
-        ("Size", ctypes.c_uint),
-        ("Quality", ctypes.c_uint),
-        ("Fs", ctypes.c_uint),
+        ("Number", ctypes.c_uint32),
+        ("Size", ctypes.c_uint32),
+        ("Quality", ctypes.c_uint32),
+        ("Fs", ctypes.c_uint32),
         ("SampleEndian", ctypes.c_uint),
     ]
 
