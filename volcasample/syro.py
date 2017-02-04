@@ -77,7 +77,6 @@ class SamplePacker:
             )
 
         lib = lib or pick_lib()
-        handle = Handle()
         flags = 0
         nFrame = ctypes.c_uint()
         fn = lib.SyroVolcaSample_Start

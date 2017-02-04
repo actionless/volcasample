@@ -14,6 +14,7 @@ from volcasample.syro import get_frame_size_sample_comp
 from volcasample.syro import pick_lib
 from volcasample.syro import DataType
 from volcasample.syro import Endian
+from volcasample.syro import Handle
 from volcasample.syro import SyroData
 
 
@@ -168,6 +169,11 @@ class SamplePackerTests(unittest.TestCase):
             Endian.LittleEndian.value if sys.byteorder == "little"
             else Endian.BigEndian.value)
         patch[0].DataType = DataType.Sample_Liner.value
+        handle = Handle()
+        status = volcasample.syro.SamplePacker.start(handle, patch[0], 1)
+        print(status)
+        status = volcasample.syro.SamplePacker.end(handle)
+        print(status)
 
     @unittest.skip("Until....")
     def test_build(self):
