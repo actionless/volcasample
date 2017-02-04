@@ -188,8 +188,11 @@ class SamplePackerTests(unittest.TestCase):
             else Endian.BigEndian.value)
         patch[0].DataType = DataType.Sample_Liner.value
         handle = Handle()
-        status = volcasample.syro.SamplePacker.start(handle, patch[0], 1)
-        print(status)
+        nFrames = volcasample.syro.SamplePacker.start(handle, patch[0], 1)
+        #for i in range(nFrames):
+        #    rv = volcasample.syro.SamplePacker.get_sample(handle)
+        #    self.assertIsInstance(rv, tuple)
+        #    self.assertEqual(2, len(rv))
         status = volcasample.syro.SamplePacker.end(handle)
         print(status)
 

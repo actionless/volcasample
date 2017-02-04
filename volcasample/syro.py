@@ -105,6 +105,17 @@ class SamplePacker:
         )
 
     @staticmethod
+    def wrap_sample_fn(lib=None):
+        lib = lib or pick_lib()
+        fn = lib.SyroVolcaSample_GetSample
+        fn.argtypes = [
+            ctypes.POINTER(Handle),
+            ctypes.POINTER(ctypes.c_uint16),
+            ctypes.POINTER(ctypes.c_uint16),
+        ]
+        return fn
+
+    @staticmethod
     def get_sample(handle, lib=None):
 
         def check(result, fn, args):
@@ -116,14 +127,11 @@ class SamplePacker:
             return status
 
         lib = lib or pick_lib()
-        fn = lib.SyroVolcaSample_GetSample
-        fn.argtypes = [
-            ctypes.POINTER(Handle),
-            ctypes.POINTER(ctypes.c_uint16),
-            ctypes.POINTER(ctypes.c_uint16),
-        ]
+        fn = SamplePacker.wrap_sample_fn()
         fn.errcheck = check
-        pass
+        left = ctypes.c_uint16()
+        right = ctypes.c_uint16()
+        return fn(ctypes.byref(handle), ctypes.pointer(left), ctypes.pointer(right))
 
     @staticmethod
     def end(handle, lib=None):
