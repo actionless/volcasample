@@ -12,12 +12,17 @@ import pkg_resources
 import volcasample.syro
 from volcasample.syro import get_frame_size_sample_comp
 from volcasample.syro import pick_lib
+from volcasample.syro import DataType
+from volcasample.syro import Endian
 from volcasample.syro import SyroData
 
 
 def sinedata(fW, durn=1, fSa=44100):
     gain = 2 ** 15
-    return [gain * math.sin(i * 2 * math.pi * fW / fSa) for i in range(durn * fSa)]
+    samples = [gain * math.sin(i * 2 * math.pi * fW / fSa) for i in range(durn * fSa)]
+    return b"".join(
+        int(i).to_bytes(2, byteorder=sys.byteorder, signed=True)
+        for i in samples)
 
 
 def sinewave(data, fP="monosin441.wav", fSa=44100):
@@ -30,12 +35,7 @@ def sinewave(data, fP="monosin441.wav", fSa=44100):
             comptype="NONE",
             compname="not compressed"
         ))
-        wav.writeframes(
-            b"".join(
-                int(i).to_bytes(2, byteorder=sys.byteorder, signed=True)
-                for i in data
-            )
-        )
+        wav.writeframes(data)
 
 
 class DiscoveryTests(unittest.TestCase):
@@ -137,6 +137,10 @@ class SyroCompTests(unittest.TestCase):
 
 class SamplePackerTests(unittest.TestCase):
 
+    @unittest.skip("Verification of test data")
+    def test_sinedata(self):
+        sinewave(sinedata(800))
+
     @unittest.skip("Until....")
     def test_start(self):
         handle = volcasample.syro.Handle()
@@ -154,7 +158,16 @@ class SamplePackerTests(unittest.TestCase):
         self.fail(status)
 
     def test_build_sine(self):
-        sinewave(sinedata(800))
+        patch = (SyroData * 10)()
+        data = sinedata(800)
+        patch[0].Number = 0
+        patch[0].pData.value = data
+        patch[0].Size = len(data)
+        patch[0].Fs = 44100
+        patch[0].SampleEndian = (
+            Endian.LittleEndian.value if sys.byteorder == "little"
+            else Endian.BigEndian.value)
+        patch[0].DataType = DataType.Sample_Liner.value
 
     @unittest.skip("Until....")
     def test_build(self):
@@ -165,5 +178,4 @@ class SamplePackerTests(unittest.TestCase):
         with open(sample, "r+b") as in_:
             data = in_.read()
         patch[0].pData.value = data
-        patch[0].Size = len(data)
  
