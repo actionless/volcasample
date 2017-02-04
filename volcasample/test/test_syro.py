@@ -15,6 +15,7 @@ from volcasample.syro import pick_lib
 from volcasample.syro import DataType
 from volcasample.syro import Endian
 from volcasample.syro import Handle
+from volcasample.syro import Status
 from volcasample.syro import SyroData
 
 
@@ -142,14 +143,30 @@ class SamplePackerTests(unittest.TestCase):
     def test_sinedata(self):
         sinewave(sinedata(800))
 
-    @unittest.skip("Until....")
-    def test_start(self):
-        handle = volcasample.syro.Handle()
-        data = SyroData(0, handle, 1, 1, 16, 44100, 0)
-        status = volcasample.syro.SamplePacker.start(
-            handle, data[0]
+    def test_start_raises_warning_with_status(self):
+        patch = (SyroData * 1)()
+        patch[0].DataType = DataType.Sample_Liner.value
+        patch[0].Number = 500
+        handle = Handle()
+        self.assertRaises(
+            RuntimeWarning,
+            volcasample.syro.SamplePacker.start,
+            handle,
+            patch[0],
+            1
         )
-        self.fail(status)
+        try:
+            volcasample.syro.SamplePacker.start(handle, patch[0], 1)
+        except RuntimeWarning as e:
+            self.assertIsInstance(e.args[0], Status)
+
+    def test_start_returns_integer(self):
+        patch = (SyroData * 1)()
+        patch[0].DataType = DataType.Sample_Liner.value
+        patch[0].Number = 1
+        handle = Handle()
+        nFrames = volcasample.syro.SamplePacker.start(handle, patch[0], 1)
+        self.assertIsInstance(nFrames, int)
 
     @unittest.skip("Until....")
     def test_end(self):

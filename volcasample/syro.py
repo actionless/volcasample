@@ -68,14 +68,21 @@ class SamplePacker:
         return data
 
     @staticmethod
-    def start(handle, data, nEntries=100, lib=None):
+    def start(handle, data, nEntries, lib=None):
+        """
+        Returns an integer number of output frames.
+
+        """
         assert 0 <= nEntries <= 110
 
         def check(result, fn, args):
-            return next(
+            status = next(
                 (i for i in Status if i.value.value == result),
                 None
             )
+            if status is not Status.Success:
+                raise RuntimeWarning(status)
+            return args[-1].contents.value
 
         lib = lib or pick_lib()
         flags = 0
@@ -94,19 +101,28 @@ class SamplePacker:
             ctypes.byref(data),
             nEntries,
             0,
-            ctypes.byref(nFrame)
+            ctypes.pointer(nFrame)
         )
 
-# TODO: SyroVolcaSample_GetSample
     @staticmethod
     def get_sample(handle, lib=None):
 
         def check(result, fn, args):
-            return next(
+            # TODO: return left, right
+            status = next(
                 (i for i in Status if i.value.value == result),
                 None
             )
+            return status
 
+        lib = lib or pick_lib()
+        fn = lib.SyroVolcaSample_GetSample
+        fn.argtypes = [
+            ctypes.POINTER(Handle),
+            ctypes.POINTER(ctypes.c_uint16),
+            ctypes.POINTER(ctypes.c_uint16),
+        ]
+        fn.errcheck = check
         pass
 
     @staticmethod
