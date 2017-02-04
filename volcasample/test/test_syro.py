@@ -2,7 +2,10 @@
 # encoding: UTF-8
 
 import ctypes
+import math
+import sys
 import unittest
+import wave
 
 import pkg_resources
 
@@ -10,6 +13,29 @@ import volcasample.syro
 from volcasample.syro import get_frame_size_sample_comp
 from volcasample.syro import pick_lib
 from volcasample.syro import SyroData
+
+
+def sinedata(fW, durn=1, fSa=44100):
+    gain = 2 ** 15
+    return [gain * math.sin(i * 2 * math.pi * fW / fSa) for i in range(durn * fSa)]
+
+
+def sinewave(data, fP="monosin441.wav", fSa=44100):
+    with wave.open(fP, "wb") as wav:
+        wav.setparams(wave._wave_params(
+            nchannels=1,
+            sampwidth=2,
+            framerate=fSa,
+            nframes=len(data),
+            comptype="NONE",
+            compname="not compressed"
+        ))
+        wav.writeframes(
+            b"".join(
+                int(i).to_bytes(2, byteorder=sys.byteorder, signed=True)
+                for i in data
+            )
+        )
 
 
 class DiscoveryTests(unittest.TestCase):
@@ -111,6 +137,7 @@ class SyroCompTests(unittest.TestCase):
 
 class SamplePackerTests(unittest.TestCase):
 
+    @unittest.skip("Until....")
     def test_start(self):
         handle = volcasample.syro.Handle()
         data = SyroData(0, handle, 1, 1, 16, 44100, 0)
@@ -119,12 +146,17 @@ class SamplePackerTests(unittest.TestCase):
         )
         self.fail(status)
 
+    @unittest.skip("Until....")
     def test_end(self):
         handle = volcasample.syro.Handle()
         status = volcasample.syro.SamplePacker.start(handle, None)
         status = volcasample.syro.SamplePacker.end(handle)
         self.fail(status)
 
+    def test_build_sine(self):
+        sinewave(sinedata(800))
+
+    @unittest.skip("Until....")
     def test_build(self):
         patch = (SyroData * 100)()
         sample = pkg_resources.resource_filename(
