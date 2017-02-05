@@ -55,6 +55,7 @@ clean:
 	$(RM) ./$(TARGET)
 	$(RM) ./$(TARGET).exe
 	$(RM) $(SYRODIR)/*.o $(EXAMPLEDIR)/*.o
+	$(RM) $(SYRODIR)/*.o $(EXAMPLEDIR)/*/syro_volcasample_example.*
 	$(RM) $(SYRODIR)/*.a $(SYRODIR)/*.so*
 
 # Listing of phony targets.

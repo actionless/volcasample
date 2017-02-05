@@ -131,7 +131,7 @@ class SyroCompTests(unittest.TestCase):
         freqS = 44100
         qam = 16
         data = volcasample.syro.SyroData(
-            volcasample.syro.DataType.Sample_Liner.value.value,
+            volcasample.syro.DataType.Sample_Compress.value.value,
             buf, 0, len(buf), nBits, freqS,
             volcasample.syro.Endian.LittleEndian.value.value,
         )
@@ -145,7 +145,7 @@ class SamplePackerTests(unittest.TestCase):
 
     def test_start_raises_warning_with_status(self):
         patch = (SyroData * 1)()
-        patch[0].DataType = DataType.Sample_Liner.value
+        patch[0].DataType = DataType.Sample_Compress.value
         patch[0].Number = 500
         handle = Handle()
         self.assertRaises(
@@ -162,7 +162,7 @@ class SamplePackerTests(unittest.TestCase):
 
     def test_start_returns_integer(self):
         patch = (SyroData * 1)()
-        patch[0].DataType = DataType.Sample_Liner.value
+        patch[0].DataType = DataType.Sample_Compress.value
         patch[0].Number = 1
         handle = Handle()
         nFrames = volcasample.syro.SamplePacker.start(handle, patch[0], 1)
@@ -186,9 +186,10 @@ class SamplePackerTests(unittest.TestCase):
         patch[0].SampleEndian = (
             Endian.LittleEndian.value if sys.byteorder == "little"
             else Endian.BigEndian.value)
-        patch[0].DataType = DataType.Sample_Liner.value
+        patch[0].DataType = DataType.Sample_Compress.value
         handle = Handle()
         nFrames = volcasample.syro.SamplePacker.start(handle, patch[0], 1)
+        print("OK so far.")
         self.assertEqual(1342352, nFrames)
         #for i in range(nFrames):
         #    print(i)
