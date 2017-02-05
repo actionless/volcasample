@@ -18,6 +18,14 @@ def lib_paths(pkg="volcasample", locn="lib"):
 def pick_lib(pkg="volcasample", locn="lib"):
     return ctypes.cdll.LoadLibrary(next(lib_paths(pkg, locn)))
 
+def point_to_bytememory(data):
+	return ctypes.cast(
+		ctypes.addressof(
+			ctypes.create_string_buffer(data)
+		),
+		ctypes.POINTER(ctypes.c_uint8)
+	)
+
 @enum.unique
 class Endian(enum.Enum):
     LittleEndian = ctypes.c_uint32(0)

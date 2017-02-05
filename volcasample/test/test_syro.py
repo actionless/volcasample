@@ -12,6 +12,7 @@ import pkg_resources
 import volcasample.syro
 from volcasample.syro import get_frame_size_sample_comp
 from volcasample.syro import pick_lib
+from volcasample.syro import point_to_bytememory
 from volcasample.syro import DataType
 from volcasample.syro import Endian
 from volcasample.syro import Handle
@@ -164,9 +165,12 @@ class SamplePackerTests(unittest.TestCase):
         patch = (SyroData * 1)()
         patch[0].DataType = DataType.Sample_Compress.value
         patch[0].Number = 1
+        patch[0].Quality = 16
+        patch[0].pData = point_to_bytememory(b"")
+        patch[0].Size = 0
         handle = Handle()
         nFrames = volcasample.syro.SamplePacker.start(handle, patch[0], 1)
-        self.assertEqual(104392, nFrames)
+        self.assertEqual(107488, nFrames)
 
     @unittest.skip("Until....")
     def test_end(self):
@@ -176,17 +180,11 @@ class SamplePackerTests(unittest.TestCase):
         self.fail(status)
 
     def test_build_sine(self):
-        def pointer_to_data(data):
-            return ctypes.cast(
-                ctypes.addressof(data),
-                ctypes.POINTER(ctypes.c_uint8)
-            )
-
         patch = (SyroData * 10)()
         data = sinedata(800)
         self.assertEqual(88200, len(data))
         patch[0].Number = 0
-        patch[0].pData = pointer_to_data(ctypes.create_string_buffer(data))
+        patch[0].pData = point_to_bytememory(data)
         patch[0].Size = len(data)
         patch[0].Quality = 16
         patch[0].Fs = 44100
@@ -197,7 +195,7 @@ class SamplePackerTests(unittest.TestCase):
         handle = Handle()
         nFrames = volcasample.syro.SamplePacker.start(handle, patch[0], 1)
         print("OK so far.")
-        self.assertEqual(1342352, nFrames)
+        self.assertEqual(946064, nFrames)
         #for i in range(nFrames):
         #    print(i)
         #    rv = volcasample.syro.SamplePacker.get_sample(handle)
