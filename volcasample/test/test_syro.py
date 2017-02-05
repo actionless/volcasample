@@ -194,15 +194,37 @@ class SamplePackerTests(unittest.TestCase):
         patch[0].DataType = DataType.Sample_Compress.value
         handle = Handle()
         nFrames = volcasample.syro.SamplePacker.start(handle, patch[0], 1)
-        print("OK so far.")
         self.assertEqual(946064, nFrames)
-        #for i in range(nFrames):
-        #    print(i)
-        #    rv = volcasample.syro.SamplePacker.get_sample(handle)
-        #    self.assertIsInstance(rv, tuple, msg=i)
-        #    self.assertEqual(2, len(rv))
+        rv = volcasample.syro.SamplePacker.get_samples(handle, nFrames)
+        self.assertEqual(nFrames, len(rv))
+        self.assertTrue(all(isinstance(i, tuple) for i in rv))
+        self.assertTrue(all(len(i) == 2 for i in rv))
         status = volcasample.syro.SamplePacker.end(handle)
-        print(status)
+        self.assertIs(status, Status.Success)
+
+    @unittest.skip("Slow test")
+    def test_build_sine_slow(self):
+        patch = (SyroData * 10)()
+        data = sinedata(800)
+        self.assertEqual(88200, len(data))
+        patch[0].Number = 0
+        patch[0].pData = point_to_bytememory(data)
+        patch[0].Size = len(data)
+        patch[0].Quality = 16
+        patch[0].Fs = 44100
+        patch[0].SampleEndian = (
+            Endian.LittleEndian.value if sys.byteorder == "little"
+            else Endian.BigEndian.value)
+        patch[0].DataType = DataType.Sample_Compress.value
+        handle = Handle()
+        nFrames = volcasample.syro.SamplePacker.start(handle, patch[0], 1)
+        self.assertEqual(946064, nFrames)
+        for i in range(nFrames):
+            rv = volcasample.syro.SamplePacker.get_sample(handle)
+            self.assertIsInstance(rv, tuple, msg=i)
+            self.assertEqual(2, len(rv))
+        status = volcasample.syro.SamplePacker.end(handle)
+        self.assertIs(status, Status.Success)
 
     @unittest.skip("Until....")
     def test_build(self):

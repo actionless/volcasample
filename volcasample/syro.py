@@ -6,7 +6,6 @@ import enum
 import os.path
 import pkg_resources
 
-# TODO: See korg_syro_volcasample_example setup_file_sample
 
 def lib_paths(pkg="volcasample", locn="lib"):
     dirPath = pkg_resources.resource_filename(pkg, locn)
@@ -127,7 +126,24 @@ class SamplePacker:
     def get_sample(handle, lib=None):
 
         def check(result, fn, args):
-            # TODO: return left, right
+            status = next(
+                (i for i in Status if i.value.value == result),
+                None
+            )
+            if status is not Status.Success:
+                raise RuntimeWarning(status)
+            return tuple(i.contents.value for i in args[-2:])
+
+        fn = SamplePacker.wrap_sample_fn()
+        fn.errcheck = check
+        left = ctypes.c_uint16()
+        right = ctypes.c_uint16()
+        return fn(handle, ctypes.pointer(left), ctypes.pointer(right))
+
+    @staticmethod
+    def get_samples(handle, nFrames, lib=None):
+
+        def check(result, fn, args):
             status = next(
                 (i for i in Status if i.value.value == result),
                 None
