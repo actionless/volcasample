@@ -10,7 +10,6 @@ import wave
 import pkg_resources
 
 import volcasample.syro
-from volcasample.syro import get_frame_size_sample_comp
 from volcasample.syro import pick_lib
 from volcasample.syro import point_to_bytememory
 from volcasample.syro import DataType
@@ -136,7 +135,10 @@ class SyroCompTests(unittest.TestCase):
             buf, 0, len(buf), nBits, freqS,
             volcasample.syro.Endian.LittleEndian.value.value,
         )
-        self.assertEqual(91208, get_frame_size_sample_comp(data))
+        self.assertEqual(
+            91208,
+            volcasample.syro.SamplePacker.get_frame_size_sample_comp(data)
+        )
 
 class SamplePackerTests(unittest.TestCase):
 
@@ -195,7 +197,7 @@ class SamplePackerTests(unittest.TestCase):
         handle = Handle()
         nFrames = volcasample.syro.SamplePacker.start(handle, patch[0], 1)
         self.assertEqual(946064, nFrames)
-        rv = volcasample.syro.SamplePacker.get_samples(handle, nFrames)
+        rv = list(volcasample.syro.SamplePacker.get_samples(handle, nFrames))
         self.assertEqual(nFrames, len(rv))
         self.assertTrue(all(isinstance(i, tuple) for i in rv))
         self.assertTrue(all(len(i) == 2 for i in rv))
@@ -235,4 +237,3 @@ class SamplePackerTests(unittest.TestCase):
         with open(sample, "r+b") as in_:
             data = in_.read()
         patch[0].pData.value = data
- 

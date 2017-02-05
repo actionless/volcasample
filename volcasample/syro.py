@@ -14,8 +14,10 @@ def lib_paths(pkg="volcasample", locn="lib"):
         for fN in pkg_resources.resource_listdir(pkg, locn)
     )
 
+
 def pick_lib(pkg="volcasample", locn="lib"):
     return ctypes.cdll.LoadLibrary(next(lib_paths(pkg, locn)))
+
 
 def point_to_bytememory(data):
 	return ctypes.cast(
@@ -25,10 +27,12 @@ def point_to_bytememory(data):
 		ctypes.POINTER(ctypes.c_uint8)
 	)
 
+
 @enum.unique
 class Endian(enum.Enum):
     LittleEndian = ctypes.c_uint32(0)
     BigEndian = ctypes.c_uint32(1)
+
 
 @enum.unique
 class DataType(enum.Enum):
@@ -39,20 +43,21 @@ class DataType(enum.Enum):
     Sample_AllCompress = ctypes.c_uint32(4)
     Pattern = ctypes.c_uint32(5)
 
+
 @enum.unique
 class Status(enum.Enum):
-    Success = ctypes.c_uint(0)
-    IllegalDataType = ctypes.c_uint(1)
-    IllegalData = ctypes.c_uint(2)
-    IllegalParameter = ctypes.c_uint(3)
-    OutOfRange_Number = ctypes.c_uint(4)
-    OutOfRange_Quality = ctypes.c_uint(5)
-    NotEnoughMemory = ctypes.c_uint(6)
-    InvalidHandle = ctypes.c_uint(7)
-    NoData = ctypes.c_uint(8)
+    Success = ctypes.c_uint32(0)
+    IllegalDataType = ctypes.c_uint32(1)
+    IllegalData = ctypes.c_uint32(2)
+    IllegalParameter = ctypes.c_uint32(3)
+    OutOfRange_Number = ctypes.c_uint32(4)
+    OutOfRange_Quality = ctypes.c_uint32(5)
+    NotEnoughMemory = ctypes.c_uint32(6)
+    InvalidHandle = ctypes.c_uint32(7)
+    NoData = ctypes.c_uint32(8)
+
 
 Handle = ctypes.c_void_p
-
 
 
 class SyroData(ctypes.Structure):
@@ -67,10 +72,12 @@ class SyroData(ctypes.Structure):
         ("SampleEndian", ctypes.c_uint32),
     ]
 
+
 class SamplePacker:
 
     @staticmethod
     def build(assets):
+        # TODO: accept metadata, data, compress/skip/delete
         data = (SyroData * len(assets))()
         return data
 
@@ -142,21 +149,17 @@ class SamplePacker:
 
     @staticmethod
     def get_samples(handle, nFrames, lib=None):
-
-        def check(result, fn, args):
-            status = next(
-                (i for i in Status if i.value.value == result),
-                None
-            )
-            if status is not Status.Success:
-                raise RuntimeWarning(status)
-            return tuple(i.contents.value for i in args[-2:])
-
         fn = SamplePacker.wrap_sample_fn()
-        fn.errcheck = check
+        fn.restype = ctypes.c_uint8
         left = ctypes.c_uint16()
+        leftPtr = ctypes.pointer(left)
         right = ctypes.c_uint16()
-        return fn(handle, ctypes.pointer(left), ctypes.pointer(right))
+        rightPtr = ctypes.pointer(right)
+
+        return (
+            (leftPtr.contents.value, rightPtr.contents.value)
+            for i in range(nFrames) if not fn(handle, leftPtr, rightPtr)
+        )
 
     @staticmethod
     def end(handle, lib=None):
@@ -173,16 +176,16 @@ class SamplePacker:
         fn.errcheck = check
         return fn(handle)
 
-def get_frame_size_sample_comp(data, lib=None):
+    @staticmethod
+    def get_frame_size_sample_comp(data, lib=None):
 
-    def check(result, fn, args):
-        return result
+        def check(result, fn, args):
+            return result
 
-    lib = lib or pick_lib()
-    fn = lib.SyroVolcaSample_GetFrameSize_Sample_Comp
-    fn.argtypes = [ctypes.POINTER(SyroData)]
-    fn.restype = ctypes.c_uint
-    fn.errcheck = check
-    rv = fn(data)
-    return rv
-
+        lib = lib or pick_lib()
+        fn = lib.SyroVolcaSample_GetFrameSize_Sample_Comp
+        fn.argtypes = [ctypes.POINTER(SyroData)]
+        fn.restype = ctypes.c_uint
+        fn.errcheck = check
+        rv = fn(data)
+        return rv
