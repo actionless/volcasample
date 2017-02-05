@@ -20,17 +20,17 @@ def pick_lib(pkg="volcasample", locn="lib"):
 
 @enum.unique
 class Endian(enum.Enum):
-    LittleEndian = ctypes.c_uint(0)
-    BigEndian = ctypes.c_uint(1)
+    LittleEndian = ctypes.c_uint32(0)
+    BigEndian = ctypes.c_uint32(1)
 
 @enum.unique
 class DataType(enum.Enum):
-    Sample_Liner = ctypes.c_uint(0)
-    Sample_Compress = ctypes.c_uint(1)
-    Sample_Erase = ctypes.c_uint(2)
-    Sample_All = ctypes.c_uint(3)
-    Sample_AllCompress = ctypes.c_uint(4)
-    Pattern = ctypes.c_uint(5)
+    Sample_Liner = ctypes.c_uint32(0)
+    Sample_Compress = ctypes.c_uint32(1)
+    Sample_Erase = ctypes.c_uint32(2)
+    Sample_All = ctypes.c_uint32(3)
+    Sample_AllCompress = ctypes.c_uint32(4)
+    Pattern = ctypes.c_uint32(5)
 
 @enum.unique
 class Status(enum.Enum):
@@ -51,13 +51,13 @@ Handle = ctypes.c_void_p
 class SyroData(ctypes.Structure):
 
     _fields_  = [
-        ("DataType", ctypes.c_uint),
-        ("pData", ctypes.POINTER(ctypes.c_ubyte)),
+        ("DataType", ctypes.c_uint32),
+        ("pData", ctypes.POINTER(ctypes.c_uint8)),
         ("Number", ctypes.c_uint32),
         ("Size", ctypes.c_uint32),
         ("Quality", ctypes.c_uint32),
         ("Fs", ctypes.c_uint32),
-        ("SampleEndian", ctypes.c_uint),
+        ("SampleEndian", ctypes.c_uint32),
     ]
 
 class SamplePacker:

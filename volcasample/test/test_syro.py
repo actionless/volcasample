@@ -176,10 +176,17 @@ class SamplePackerTests(unittest.TestCase):
         self.fail(status)
 
     def test_build_sine(self):
+        def pointer_to_data(data):
+            return ctypes.cast(
+                ctypes.addressof(data),
+                ctypes.POINTER(ctypes.c_uint8)
+            )
+
         patch = (SyroData * 10)()
         data = sinedata(800)
+        self.assertEqual(88200, len(data))
         patch[0].Number = 0
-        patch[0].pData.value = data
+        patch[0].pData = pointer_to_data(ctypes.create_string_buffer(data))
         patch[0].Size = len(data)
         patch[0].Quality = 16
         patch[0].Fs = 44100
