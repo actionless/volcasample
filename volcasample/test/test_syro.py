@@ -243,12 +243,24 @@ class SamplePackerTests(unittest.TestCase):
         status = volcasample.syro.SamplePacker.end(handle)
         self.assertIs(status, Status.Success)
 
-    @unittest.skip("Until....")
-    def test_build(self):
-        patch = (SyroData * 100)()
+    def test_build_wav(self):
+        patch = (SyroData)()
         sample = pkg_resources.resource_filename(
             "volcasample.test", "data/pcm1608m.wav"
         )
-        with open(sample, "r+b") as in_:
-            data = in_.read()
-        patch[0].pData.value = data
+        with wave.open(sample, "rb") as wav:
+            data = wav.readframes(wav.getnframes())
+            patch.Number = 0
+            patch.pData = point_to_bytememory(data)
+            patch.Size = len(data)
+            patch.Quality = 8 * wav.getsampwidth()
+            patch.Fs = wav.getframerate()
+            patch.SampleEndian = (
+                Endian.LittleEndian.value if sys.byteorder == "little"
+                else Endian.BigEndian.value)
+            patch.DataType = DataType.Sample_Compress.value
+            handle = Handle()
+            nFrames = volcasample.syro.SamplePacker.start(handle, patch, 1)
+            rv = list(volcasample.syro.SamplePacker.get_samples(handle, nFrames))
+            status = volcasample.syro.SamplePacker.end(handle)
+            self.assertIs(status, Status.Success)
