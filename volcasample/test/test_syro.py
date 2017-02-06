@@ -265,23 +265,16 @@ class SamplePackerTests(unittest.TestCase):
             status = volcasample.syro.SamplePacker.end(handle)
             self.assertIs(status, Status.Success)
 
+        import struct
         with wave.open("volcaloader.wav", "wb") as wav:
-            data = b"".join(
-                int(l).to_bytes(
-                    2, byteorder=sys.byteorder, signed=False
-                ) +
-                int(r).to_bytes(
-                    2, byteorder=sys.byteorder, signed=False
-                )
-                for l, r in rv
-            )
             wav.setparams(wave._wave_params(
                 nchannels=2,
                 sampwidth=2,
                 framerate=44100,
-                nframes=len(rv),
+                nframes=nFrames,
                 comptype="NONE",
                 compname="not compressed"
             ))
-            wav.writeframes(data)
+            for l, r in rv:
+                wav.writeframesraw(struct.pack("<HH", l, r))
             
