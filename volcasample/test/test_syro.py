@@ -244,26 +244,24 @@ class SamplePackerTests(unittest.TestCase):
         self.assertIs(status, Status.Success)
 
     def test_build_wav(self):
-        patch = (SyroData)()
+        patch = (SyroData * 1)()
         sample = pkg_resources.resource_filename(
             "volcasample.test", "data/pcm1608m.wav"
         )
         with wave.open(sample, "rb") as wav:
             data = wav.readframes(wav.getnframes())
             patch.Number = 0
-            patch.pData = point_to_bytememory(data)
-            patch.Size = len(data)
-            patch.Quality = 8 * wav.getsampwidth()
-            patch.Fs = wav.getframerate()
-            patch.SampleEndian = (
+            patch[0].pData = point_to_bytememory(data)
+            patch[0].Size = len(data)
+            patch[0].Quality = 8 * wav.getsampwidth()
+            patch[0].Fs = wav.getframerate()
+            patch[0].SampleEndian = (
                 Endian.LittleEndian.value if sys.byteorder == "little"
                 else Endian.BigEndian.value)
-            patch.DataType = DataType.Sample_Compress.value
+            patch[0].DataType = DataType.Sample_Compress.value
             handle = Handle()
-            nFrames = volcasample.syro.SamplePacker.start(handle, patch, 1)
+            nFrames = volcasample.syro.SamplePacker.start(handle, patch[0], 1)
             rv = list(volcasample.syro.SamplePacker.get_samples(handle, nFrames))
-            status = volcasample.syro.SamplePacker.end(handle)
-            self.assertIs(status, Status.Success)
 
         import struct
         with wave.open("volcaloader.wav", "wb") as wav:
@@ -276,5 +274,7 @@ class SamplePackerTests(unittest.TestCase):
                 compname="not compressed"
             ))
             for l, r in rv:
-                wav.writeframesraw(struct.pack("<HH", l, r))
+                wav.writeframesraw(struct.pack(">HH", l, r))
             
+        status = volcasample.syro.SamplePacker.end(handle)
+        self.assertIs(status, Status.Success)
