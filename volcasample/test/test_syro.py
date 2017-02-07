@@ -253,7 +253,7 @@ class SamplePackerTests(unittest.TestCase):
         with wave.open(sample, "rb") as wav:
             data = wav.readframes(wav.getnframes())
 
-        patch.Number = 0
+        patch[0].Number = 0
         patch[0].pData = point_to_bytememory(data)
         patch[0].Size = len(data)
         patch[0].Quality = 8 * wav.getsampwidth()
