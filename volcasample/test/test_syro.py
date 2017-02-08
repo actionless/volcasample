@@ -18,6 +18,7 @@
 
 import ctypes
 import math
+import struct
 import sys
 import unittest
 import wave
@@ -186,15 +187,12 @@ class SamplePackerTests(unittest.TestCase):
         patch[0].pData = point_to_bytememory(b"")
         patch[0].Size = 0
         handle = Handle()
-        nFrames = volcasample.syro.SamplePacker.start(handle, patch[0], 1)
-        self.assertEqual(107488, nFrames)
-
-    @unittest.skip("Until....")
-    def test_end(self):
-        handle = volcasample.syro.Handle()
-        status = volcasample.syro.SamplePacker.start(handle, None)
-        status = volcasample.syro.SamplePacker.end(handle)
-        self.fail(status)
+        try:
+            nFrames = volcasample.syro.SamplePacker.start(handle, patch[0], 1)
+            self.assertEqual(107488, nFrames)
+        finally:
+            status = volcasample.syro.SamplePacker.end(handle)
+            self.assertIs(status, Status.Success)
 
     def test_build_sine(self):
         patch = (SyroData * 10)()
@@ -210,14 +208,16 @@ class SamplePackerTests(unittest.TestCase):
             else Endian.BigEndian.value)
         patch[0].DataType = DataType.Sample_Compress.value
         handle = Handle()
-        nFrames = volcasample.syro.SamplePacker.start(handle, patch[0], 1)
-        self.assertEqual(946064, nFrames)
-        rv = list(volcasample.syro.SamplePacker.get_samples(handle, nFrames))
-        self.assertEqual(nFrames, len(rv))
-        self.assertTrue(all(isinstance(i, tuple) for i in rv))
-        self.assertTrue(all(len(i) == 2 for i in rv))
-        status = volcasample.syro.SamplePacker.end(handle)
-        self.assertIs(status, Status.Success)
+        try:
+            nFrames = volcasample.syro.SamplePacker.start(handle, patch[0], 1)
+            self.assertEqual(946064, nFrames)
+            rv = list(volcasample.syro.SamplePacker.get_samples(handle, nFrames))
+            self.assertEqual(nFrames, len(rv))
+            self.assertTrue(all(isinstance(i, tuple) for i in rv))
+            self.assertTrue(all(len(i) == 2 for i in rv))
+        finally:
+            status = volcasample.syro.SamplePacker.end(handle)
+            self.assertIs(status, Status.Success)
 
     @unittest.skip("Slow test")
     def test_build_sine_slow(self):
@@ -234,14 +234,16 @@ class SamplePackerTests(unittest.TestCase):
             else Endian.BigEndian.value)
         patch[0].DataType = DataType.Sample_Compress.value
         handle = Handle()
-        nFrames = volcasample.syro.SamplePacker.start(handle, patch[0], 1)
-        self.assertEqual(946064, nFrames)
-        for i in range(nFrames):
-            rv = volcasample.syro.SamplePacker.get_sample(handle)
-            self.assertIsInstance(rv, tuple, msg=i)
-            self.assertEqual(2, len(rv))
-        status = volcasample.syro.SamplePacker.end(handle)
-        self.assertIs(status, Status.Success)
+        try:
+            nFrames = volcasample.syro.SamplePacker.start(handle, patch[0], 1)
+            self.assertEqual(946064, nFrames)
+            for i in range(nFrames):
+                rv = volcasample.syro.SamplePacker.get_sample(handle)
+                self.assertIsInstance(rv, tuple, msg=i)
+                self.assertEqual(2, len(rv))
+        finally:
+            status = volcasample.syro.SamplePacker.end(handle)
+            self.assertIs(status, Status.Success)
 
     def test_build_wav(self):
         patch = (SyroData * 1)()
@@ -250,31 +252,33 @@ class SamplePackerTests(unittest.TestCase):
         )
         with wave.open(sample, "rb") as wav:
             data = wav.readframes(wav.getnframes())
-            patch.Number = 0
-            patch[0].pData = point_to_bytememory(data)
-            patch[0].Size = len(data)
-            patch[0].Quality = 8 * wav.getsampwidth()
-            patch[0].Fs = wav.getframerate()
-            patch[0].SampleEndian = (
-                Endian.LittleEndian.value if sys.byteorder == "little"
-                else Endian.BigEndian.value)
-            patch[0].DataType = DataType.Sample_Compress.value
-            handle = Handle()
+
+        patch[0].Number = 0
+        patch[0].pData = point_to_bytememory(data)
+        patch[0].Size = len(data)
+        patch[0].Quality = 8 * wav.getsampwidth()
+        patch[0].Fs = wav.getframerate()
+        patch[0].SampleEndian = (
+            Endian.LittleEndian.value if sys.byteorder == "little"
+            else Endian.BigEndian.value)
+        patch[0].DataType = DataType.Sample_Compress.value
+        handle = Handle()
+        try:
             nFrames = volcasample.syro.SamplePacker.start(handle, patch[0], 1)
             rv = list(volcasample.syro.SamplePacker.get_samples(handle, nFrames))
 
-        import struct
-        with wave.open("volcaloader.wav", "wb") as wav:
-            wav.setparams(wave._wave_params(
-                nchannels=2,
-                sampwidth=2,
-                framerate=44100,
-                nframes=nFrames,
-                comptype="NONE",
-                compname="not compressed"
-            ))
-            for l, r in rv:
-                wav.writeframesraw(struct.pack(">HH", l, r))
-            
-        status = volcasample.syro.SamplePacker.end(handle)
-        self.assertIs(status, Status.Success)
+            with wave.open("volcaloader.wav", "wb") as wav:
+                wav.setparams(wave._wave_params(
+                    nchannels=2,
+                    sampwidth=2,
+                    framerate=44100,
+                    nframes=nFrames,
+                    comptype="NONE",
+                    compname="not compressed"
+                ))
+                for l, r in rv:
+                    wav.writeframesraw(struct.pack("<HH", l, r))
+
+        finally: 
+            status = volcasample.syro.SamplePacker.end(handle)
+            self.assertIs(status, Status.Success)
