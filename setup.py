@@ -74,6 +74,10 @@ setup(
                 "syro/korg_syro_comp.c",
                 "syro/korg_syro_func.c",
                 "syro/korg_syro_volcasample.c",
+            ],
+            extra_compile_args=[
+                "-O3", "-Wall", "-W", "-Wformat=2", "-Wcast-qual", "-Wcast-align",
+                "-Wwrite-strings", "-Wconversion", "-Wfloat-equal", "-Wpointer-arith", "-fPIC"
             ]
         )
     ],
