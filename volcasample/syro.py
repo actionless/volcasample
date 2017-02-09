@@ -126,8 +126,8 @@ class SamplePacker:
         ]
         fn.errcheck = check
         return fn(
-            ctypes.byref(handle),
-            ctypes.cast(ctypes.addressof(data), ctypes.POINTER(SyroData)),
+            handle,
+            data,
             nEntries,
             0,
             ctypes.pointer(nFrame)

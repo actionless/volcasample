@@ -256,8 +256,7 @@ class SamplePackerTests(unittest.TestCase):
         patch[0].Number = 0
         patch[0].pData.contents = point_to_bytememory(data)
         patch[0].Size = len(data)
-        #patch[0].Quality = 8 * wav.getsampwidth()
-        patch[0].Quality = 16
+        patch[0].Quality = 8 * wav.getsampwidth()
         patch[0].Fs = wav.getframerate()
         patch[0].SampleEndian = (
             Endian.LittleEndian.value if sys.byteorder == "little"
@@ -266,13 +265,9 @@ class SamplePackerTests(unittest.TestCase):
         handle = Handle()
         try:
             nFrames = volcasample.syro.SamplePacker.start(
-                handle, patch, 1
+                handle, patch, len(patch)
             )
             rv = list(volcasample.syro.SamplePacker.get_samples(handle, nFrames))
-            #rv = [
-            #    volcasample.syro.SamplePacker.get_sample(handle)
-            #    for i in range(nFrames)
-            #]
 
             with wave.open("volcaloader.wav", "wb") as wav:
                 wav.setparams(wave._wave_params(
@@ -284,8 +279,6 @@ class SamplePackerTests(unittest.TestCase):
                     compname="not compressed"
                 ))
                 for l, r in rv:
-                    # Goes wrong at 88442
-                    # print("{0}\t{1}".format(l, r))
                     wav.writeframesraw(struct.pack("<hh", l, r))
 
         finally: 
