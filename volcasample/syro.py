@@ -120,8 +120,8 @@ class SamplePacker:
         fn.argtypes = [
             ctypes.POINTER(Handle),
             ctypes.POINTER(SyroData),
-            ctypes.c_int,
-            ctypes.c_uint,
+            ctypes.c_uint32,
+            ctypes.c_uint32,
             ctypes.POINTER(ctypes.c_uint32)
         ]
         fn.errcheck = check
@@ -173,7 +173,8 @@ class SamplePacker:
 
         return (
             (leftPtr.contents.value, rightPtr.contents.value)
-            for i in range(nFrames) if not fn(handle, leftPtr, rightPtr)
+            for i in range(nFrames)
+            if not fn(handle, leftPtr, rightPtr)
         )
 
     @staticmethod
