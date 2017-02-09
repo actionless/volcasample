@@ -254,7 +254,7 @@ class SamplePackerTests(unittest.TestCase):
             data = wav.readframes(wav.getnframes())
 
         patch[0].Number = 0
-        patch[0].pData = point_to_bytememory(data)
+        patch[0].pData.contents = point_to_bytememory(data)
         patch[0].Size = len(data)
         #patch[0].Quality = 8 * wav.getsampwidth()
         patch[0].Quality = 16
@@ -266,7 +266,7 @@ class SamplePackerTests(unittest.TestCase):
         handle = Handle()
         try:
             nFrames = volcasample.syro.SamplePacker.start(
-                handle, patch[0], 1
+                handle, patch, 1
             )
             rv = list(volcasample.syro.SamplePacker.get_samples(handle, nFrames))
             #rv = [
