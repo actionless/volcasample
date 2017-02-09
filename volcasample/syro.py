@@ -139,8 +139,8 @@ class SamplePacker:
         fn = lib.SyroVolcaSample_GetSample
         fn.argtypes = [
             Handle,
-            ctypes.POINTER(ctypes.c_uint16),
-            ctypes.POINTER(ctypes.c_uint16),
+            ctypes.POINTER(ctypes.c_int16),
+            ctypes.POINTER(ctypes.c_int16),
         ]
         return fn
 
@@ -158,17 +158,17 @@ class SamplePacker:
 
         fn = SamplePacker.wrap_sample_fn()
         fn.errcheck = check
-        left = ctypes.c_uint16()
-        right = ctypes.c_uint16()
+        left = ctypes.c_int16()
+        right = ctypes.c_int16()
         return fn(handle, ctypes.pointer(left), ctypes.pointer(right))
 
     @staticmethod
     def get_samples(handle, nFrames, lib=None):
         fn = SamplePacker.wrap_sample_fn()
         fn.restype = ctypes.c_uint8
-        left = ctypes.c_uint16()
+        left = ctypes.c_int16()
         leftPtr = ctypes.pointer(left)
-        right = ctypes.c_uint16()
+        right = ctypes.c_int16()
         rightPtr = ctypes.pointer(right)
 
         return (

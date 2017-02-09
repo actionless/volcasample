@@ -277,7 +277,8 @@ class SamplePackerTests(unittest.TestCase):
                     compname="not compressed"
                 ))
                 for l, r in rv:
-                    wav.writeframesraw(struct.pack("<HH", l, r))
+                    print("{0}\t{1}".format(l, r))
+                    wav.writeframesraw(struct.pack("<hh", l, r))
 
         finally: 
             status = volcasample.syro.SamplePacker.end(handle)
