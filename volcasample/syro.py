@@ -20,6 +20,9 @@ import ctypes
 import enum
 import os.path
 import pkg_resources
+import struct
+import sys
+import wave
 
 
 def lib_paths(pkg="volcasample", locn="lib"):
@@ -91,10 +94,49 @@ class SyroData(ctypes.Structure):
 class SamplePacker:
 
     @staticmethod
-    def build(assets):
-        # TODO: accept metadata, data, compress/skip/delete
-        data = (SyroData * len(assets))()
-        return data
+    def build(patch, locn=None, output="volcasamples.wav"):
+        locn = locn or os.path.expanduser("~")
+        handle = Handle()
+        try:
+            nFrames = SamplePacker.start(handle, patch, len(patch))
+            rv = list(SamplePacker.get_samples(handle, nFrames))
+
+            with wave.open(os.path.join(locn, output), "wb") as wav:
+                wav.setparams(wave._wave_params(
+                    nchannels=2,
+                    sampwidth=2,
+                    framerate=44100,
+                    nframes=nFrames,
+                    comptype="NONE",
+                    compname="not compressed"
+                ))
+                for l, r in rv:
+                    wav.writeframesraw(struct.pack("<hh", l, r))
+
+        finally:
+            return SamplePacker.end(handle)
+
+    @staticmethod
+    def patch(jobs):
+        """
+        Jobs is an ordered dictionary of {int: (dataType, filePath)}
+
+        """
+        rv = (SyroData * len(jobs))()
+        for i, (n, (dt, fP)) in enumerate(jobs.items()):
+            rv[i].Number = n
+            with wave.open(fP, "rb") as wav:
+                data = wav.readframes(wav.getnframes())
+            rv[i].pData.contents = point_to_bytememory(data)
+            rv[i].Size = len(data)
+            rv[i].Quality = 8 * wav.getsampwidth()
+            rv[i].Fs = wav.getframerate()
+            rv[i].SampleEndian = (
+                Endian.LittleEndian.value if sys.byteorder == "little"
+                else Endian.BigEndian.value)
+            rv[i].DataType = dt.value
+
+        return rv
 
     @staticmethod
     def start(handle, data, nEntries, lib=None):
