@@ -16,6 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with volcasample.  If not, see <http://www.gnu.org/licenses/>.
 
+from collections import OrderedDict
 import ctypes
 import math
 import struct
@@ -245,6 +246,18 @@ class SamplePackerTests(unittest.TestCase):
             status = volcasample.syro.SamplePacker.end(handle)
             self.assertIs(status, Status.Success)
 
+    def test_patch(self):
+        sample = pkg_resources.resource_filename(
+            "volcasample.test", "data/pcm1608m.wav"
+        )
+        jobs = OrderedDict([
+            (0, (DataType.Sample_Compress, sample))
+        ])
+        rv = volcasample.syro.SamplePacker.patch(jobs)
+        self.assertIsInstance(rv, SyroData * 1)
+        self.assertEqual(1, rv[0].DataType)
+
+    @unittest.skip("Slow test")
     def test_build_wav(self):
         patch = (SyroData * 1)()
         sample = pkg_resources.resource_filename(
