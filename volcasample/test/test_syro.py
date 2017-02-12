@@ -166,7 +166,7 @@ class SyroCompTests(unittest.TestCase):
 
 class SamplePackerTests(unittest.TestCase):
 
-    #@unittest.skip("Verification of test data")
+    @unittest.skip("Verification of test data")
     def test_sinedata(self):
         sinewave(sinedata(800))
 
@@ -207,7 +207,6 @@ class SamplePackerTests(unittest.TestCase):
         data = sinedata(800)
         self.assertEqual(88200, len(data))
         patch[0].Number = 0
-        #patch[0].pData.contents = point_to_bytememory(data)
         patch[0].pData.contents = point_to_bytememory(data)
         patch[0].Size = len(data)
         patch[0].Quality = 16
@@ -265,7 +264,7 @@ class SamplePackerTests(unittest.TestCase):
         self.assertIsInstance(rv, SyroData * 1)
         self.assertEqual(1, rv[0].DataType)
 
-    def test_build_sine(self):
+    def test_manual_patch_sine(self):
         patch = (SyroData * 1)()
         data = sinedata(440)
         patch[0].Number = 0
