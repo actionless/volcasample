@@ -19,8 +19,10 @@
 from collections import OrderedDict
 import ctypes
 import math
+import os.path
 import struct
 import sys
+import tempfile
 import unittest
 import wave
 
@@ -257,8 +259,7 @@ class SamplePackerTests(unittest.TestCase):
         self.assertIsInstance(rv, SyroData * 1)
         self.assertEqual(1, rv[0].DataType)
 
-    @unittest.skip("Slow test")
-    def test_build_wav(self):
+    def test_build(self):
         patch = (SyroData * 1)()
         sample = pkg_resources.resource_filename(
             "volcasample.test", "data/pcm1608m.wav"
@@ -275,25 +276,25 @@ class SamplePackerTests(unittest.TestCase):
             Endian.LittleEndian.value if sys.byteorder == "little"
             else Endian.BigEndian.value)
         patch[0].DataType = DataType.Sample_Compress.value
-        handle = Handle()
+
+        fD, fP = tempfile.mkstemp(suffix=".wav")
         try:
-            nFrames = volcasample.syro.SamplePacker.start(
-                handle, patch, len(patch)
+            status = volcasample.syro.SamplePacker.build(
+                patch, *os.path.split(fP)
             )
-            rv = list(volcasample.syro.SamplePacker.get_samples(handle, nFrames))
-
-            with wave.open("volcaloader.wav", "wb") as wav:
-                wav.setparams(wave._wave_params(
-                    nchannels=2,
-                    sampwidth=2,
-                    framerate=44100,
-                    nframes=nFrames,
-                    comptype="NONE",
-                    compname="not compressed"
-                ))
-                for l, r in rv:
-                    wav.writeframesraw(struct.pack("<hh", l, r))
-
-        finally: 
-            status = volcasample.syro.SamplePacker.end(handle)
             self.assertIs(status, Status.Success)
+            with wave.open(fP, "rb") as wav:
+                params = wav.getparams()._asdict()
+                nFrames = params.pop("nframes")
+                self.assertEqual(
+                    dict(
+                        nchannels=2, sampwidth=2, framerate=44100,
+                        comptype="NONE",
+                        compname="not compressed"
+                    ),
+                    params
+                , params)
+                self.assertTrue(1086832 <= nFrames) 
+        finally:
+            os.close(fD)
+            os.remove(fP)
