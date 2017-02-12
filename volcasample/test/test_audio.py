@@ -17,7 +17,9 @@
 # along with volcasample.  If not, see <http://www.gnu.org/licenses/>.
 
 import operator
+import os
 import sys
+import tempfile
 import unittest
 import wave
 
@@ -75,6 +77,11 @@ class ConversionTests(unittest.TestCase):
             "volcasample.test",
             "data/380_gunshot_single-mike-koenig-short.wav"
         )
-        with wave.open(stereo, "rb") as data:
-            rv = Audio.wav_to_mono(data, "test.wav")
-            self.assertEqual(1, rv.getnchannels())
+        fD, fP = tempfile.mkstemp(suffix=".wav")
+        try:
+            with wave.open(stereo, "rb") as data:
+                rv = Audio.wav_to_mono(data, fP)
+                self.assertEqual(1, rv.getnchannels())
+        finally:
+            os.close(fD)
+            os.remove(fP)

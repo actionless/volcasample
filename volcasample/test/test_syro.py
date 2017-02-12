@@ -39,10 +39,15 @@ from volcasample.syro import SyroData
 
 
 def sinedata(fW, durn=1, fSa=44100):
-    gain = 2 ** 15
-    samples = [gain * math.sin(i * 2 * math.pi * fW / fSa) for i in range(durn * fSa)]
+    offset = 1
+    gain = 2 ** 14
+    samples = [
+        gain * (
+            offset + math.sin(i * 2 * math.pi * fW / fSa)
+        )
+        for i in range(durn * fSa)]
     return b"".join(
-        int(i).to_bytes(2, byteorder=sys.byteorder, signed=True)
+        int(i).to_bytes(2, byteorder=sys.byteorder, signed=False)
         for i in samples)
 
 
@@ -161,7 +166,7 @@ class SyroCompTests(unittest.TestCase):
 
 class SamplePackerTests(unittest.TestCase):
 
-    @unittest.skip("Verification of test data")
+    #@unittest.skip("Verification of test data")
     def test_sinedata(self):
         sinewave(sinedata(800))
 
@@ -187,7 +192,7 @@ class SamplePackerTests(unittest.TestCase):
         patch[0].DataType = DataType.Sample_Compress.value
         patch[0].Number = 1
         patch[0].Quality = 16
-        patch[0].pData = point_to_bytememory(b"")
+        patch[0].pData.contents = point_to_bytememory(b"")
         patch[0].Size = 0
         handle = Handle()
         try:
@@ -202,7 +207,8 @@ class SamplePackerTests(unittest.TestCase):
         data = sinedata(800)
         self.assertEqual(88200, len(data))
         patch[0].Number = 0
-        patch[0].pData = point_to_bytememory(data)
+        #patch[0].pData.contents = point_to_bytememory(data)
+        patch[0].pData.contents = point_to_bytememory(data)
         patch[0].Size = len(data)
         patch[0].Quality = 16
         patch[0].Fs = 44100
@@ -228,7 +234,7 @@ class SamplePackerTests(unittest.TestCase):
         data = sinedata(800)
         self.assertEqual(88200, len(data))
         patch[0].Number = 0
-        patch[0].pData = point_to_bytememory(data)
+        patch[0].pData.contents = point_to_bytememory(data)
         patch[0].Size = len(data)
         patch[0].Quality = 16
         patch[0].Fs = 44100
@@ -259,14 +265,49 @@ class SamplePackerTests(unittest.TestCase):
         self.assertIsInstance(rv, SyroData * 1)
         self.assertEqual(1, rv[0].DataType)
 
-    def test_build(self):
+    def test_build_sine(self):
+        patch = (SyroData * 1)()
+        data = sinedata(440)
+        patch[0].Number = 0
+        patch[0].pData.contents = point_to_bytememory(data)
+        patch[0].Size = len(data)
+        patch[0].Quality = 16
+        patch[0].Fs = 44100
+        patch[0].SampleEndian = (
+            Endian.LittleEndian.value if sys.byteorder == "little"
+            else Endian.BigEndian.value)
+        patch[0].DataType = DataType.Sample_Compress.value
+
+        fD, fP = tempfile.mkstemp(suffix=".wav")
+        try:
+            status = volcasample.syro.SamplePacker.build(
+                patch, *os.path.split(fP)
+            )
+            self.assertIs(status, Status.Success)
+            with wave.open(fP, "rb") as wav:
+                params = wav.getparams()._asdict()
+                nFrames = params.pop("nframes")
+                self.assertEqual(
+                    dict(
+                        nchannels=2, sampwidth=2, framerate=44100,
+                        comptype="NONE",
+                        compname="not compressed"
+                    ),
+                    params
+                , params)
+                self.assertTrue(1086832 <= nFrames) 
+        finally:
+            os.close(fD)
+            #os.remove(fP)
+
+    def test_build_wav(self):
         patch = (SyroData * 1)()
         sample = pkg_resources.resource_filename(
             "volcasample.test", "data/pcm1608m.wav"
         )
         with wave.open(sample, "rb") as wav:
             data = wav.readframes(wav.getnframes())
-
+        data = sinedata(440)
         patch[0].Number = 0
         patch[0].pData.contents = point_to_bytememory(data)
         patch[0].Size = len(data)
