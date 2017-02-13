@@ -39,9 +39,7 @@ def pick_lib(pkg="volcasample", locn="lib"):
 
 def point_to_bytememory(data):
 	return ctypes.cast(
-		ctypes.addressof(
-			ctypes.create_string_buffer(data)
-		),
+        ctypes.c_char_p(data),
 		ctypes.POINTER(ctypes.c_uint8)
 	)
 

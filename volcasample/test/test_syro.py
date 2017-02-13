@@ -192,7 +192,7 @@ class SamplePackerTests(unittest.TestCase):
         patch[0].DataType = DataType.Sample_Compress.value
         patch[0].Number = 1
         patch[0].Quality = 16
-        patch[0].pData.contents = point_to_bytememory(b"")
+        patch[0].pData = point_to_bytememory(b"")
         patch[0].Size = 0
         handle = Handle()
         try:
@@ -207,7 +207,7 @@ class SamplePackerTests(unittest.TestCase):
         data = sinedata(800)
         self.assertEqual(88200, len(data))
         patch[0].Number = 0
-        patch[0].pData.contents = point_to_bytememory(data)
+        patch[0].pData = point_to_bytememory(data)
         patch[0].Size = len(data)
         patch[0].Quality = 16
         patch[0].Fs = 44100
@@ -218,7 +218,7 @@ class SamplePackerTests(unittest.TestCase):
         handle = Handle()
         try:
             nFrames = volcasample.syro.SamplePacker.start(handle, patch[0], 1)
-            self.assertEqual(946064, nFrames)
+            self.assertEqual(881048, nFrames)
             rv = list(volcasample.syro.SamplePacker.get_samples(handle, nFrames))
             self.assertEqual(nFrames, len(rv))
             self.assertTrue(all(isinstance(i, tuple) for i in rv))
@@ -233,7 +233,7 @@ class SamplePackerTests(unittest.TestCase):
         data = sinedata(800)
         self.assertEqual(88200, len(data))
         patch[0].Number = 0
-        patch[0].pData.contents = point_to_bytememory(data)
+        patch[0].pData = point_to_bytememory(data)
         patch[0].Size = len(data)
         patch[0].Quality = 16
         patch[0].Fs = 44100
@@ -268,7 +268,7 @@ class SamplePackerTests(unittest.TestCase):
         patch = (SyroData * 1)()
         data = sinedata(440)
         patch[0].Number = 0
-        patch[0].pData.contents = point_to_bytememory(data)
+        patch[0].pData = point_to_bytememory(data)
         patch[0].Size = len(data)
         patch[0].Quality = 16
         patch[0].Fs = 44100
@@ -294,10 +294,10 @@ class SamplePackerTests(unittest.TestCase):
                     ),
                     params
                 , params)
-                self.assertTrue(1086832 <= nFrames) 
+                self.assertEqual(778880, nFrames) 
         finally:
             os.close(fD)
-            #os.remove(fP)
+            os.remove(fP)
 
     def test_build_wav(self):
         patch = (SyroData * 1)()
@@ -306,9 +306,8 @@ class SamplePackerTests(unittest.TestCase):
         )
         with wave.open(sample, "rb") as wav:
             data = wav.readframes(wav.getnframes())
-        data = sinedata(440)
         patch[0].Number = 0
-        patch[0].pData.contents = point_to_bytememory(data)
+        patch[0].pData = point_to_bytememory(data)
         patch[0].Size = len(data)
         patch[0].Quality = 8 * wav.getsampwidth()
         patch[0].Fs = wav.getframerate()
@@ -334,7 +333,7 @@ class SamplePackerTests(unittest.TestCase):
                     ),
                     params
                 , params)
-                self.assertTrue(1086832 <= nFrames) 
+                self.assertEqual(1501696, nFrames) 
         finally:
             os.close(fD)
             os.remove(fP)
