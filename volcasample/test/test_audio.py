@@ -103,8 +103,8 @@ class ConversionTests(unittest.TestCase):
                 self.assertEqual(1, rv.getnchannels())
 
             wav, data = ConversionTests.extract_wav_data(fP)
-            self.assertEqual(65416, max(Audio.find_peaks(data)))
-            self.assertEqual(-65536, min(Audio.find_peaks(data)))
+            self.assertEqual(32708, max(Audio.find_peaks(data)))
+            self.assertEqual(-32768, min(Audio.find_peaks(data)))
         finally:
             os.close(fD)
             os.remove(fP)

@@ -123,12 +123,17 @@ class SamplePacker:
         rv = (SyroData * len(jobs))()
         for i, (n, (dt, fP)) in enumerate(jobs.items()):
             rv[i].Number = n
-            with wave.open(fP, "rb") as wav:
-                data = wav.readframes(wav.getnframes())
-            rv[i].pData.contents = point_to_bytememory(data)
-            rv[i].Size = len(data)
-            rv[i].Quality = 8 * wav.getsampwidth()
-            rv[i].Fs = wav.getframerate()
+            if dt == DataType.Sample_Compress:
+                with wave.open(fP, "rb") as wav:
+                    data = wav.readframes(wav.getnframes())
+                rv[i].pData.contents = point_to_bytememory(data)
+                rv[i].Size = len(data)
+                rv[i].Quality = 8 * wav.getsampwidth()
+                rv[i].Fs = wav.getframerate()
+            else:
+                rv[i].pData = None
+                rv[i].Size = 0
+
             rv[i].SampleEndian = (
                 Endian.LittleEndian.value if sys.byteorder == "little"
                 else Endian.BigEndian.value)

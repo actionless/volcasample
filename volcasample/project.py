@@ -127,7 +127,7 @@ class Project:
         tgts = list(Project.refresh(path, start, span, quiet=True))
         for tgt in tgts:
             n = int(os.path.basename(os.path.dirname(tgt["path"])))
-            if tgt["nchannels"] > 1:
+            if tgt["nchannels"] > 1 or tgt["sampwidth"] > 2:
                 fP = os.path.splitext(tgt["path"])[0] + ".ref"
                 os.replace(tgt["path"], fP)
                 with wave.open(fP, "rb") as wav:
@@ -137,13 +137,17 @@ class Project:
             Project.progress_point(n, quiet=quiet)
         Project.progress_point(quiet=quiet)
 
-    def __init__(self,path,  start, span):
+    def __init__(self,path, start, span, quiet=True):
         self.path, self.start, self.span = path, start, span
+        self.quiet = quiet
         self._assets = []
 
     def __enter__(self):
         self._assets = []
-        for metadata in self.check(self.path, self.start, self.span):
+        for metadata in self.check(
+            self.path, self.start, self.span, quiet=self.quiet
+        ):
+            print(metadata)
             with open(metadata["path"], "r+b") as src:
                 data = src.read()
                 self._assets.append(Project.Asset(metadata, data))
@@ -154,13 +158,14 @@ class Project:
         return False
 
     def assemble(self, vote=0, locn=None):
-        jobs = OrderedDict([(
-            int(os.path.basename(os.path.dirname(i.metadata["path"]))),
-            (volcasample.syro.DataType.Sample_Erase, i.metadata["path"]))
-            for i in self._assets
-            if i.metadata.get("vote", 0) < vote
-        ])
-        jobs.update(OrderedDict([(
+        #jobs = OrderedDict([(
+        #    int(os.path.basename(os.path.dirname(i.metadata["path"]))),
+        #    (volcasample.syro.DataType.Sample_Erase, i.metadata["path"]))
+        #    for i in self._assets
+        #    if i.metadata.get("vote", 0) < vote
+        #])
+        #jobs.update(OrderedDict([(
+        jobs = (OrderedDict([(
             int(os.path.basename(os.path.dirname(i.metadata["path"]))),
             (volcasample.syro.DataType.Sample_Compress, i.metadata["path"]))
             for i in self._assets

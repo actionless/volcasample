@@ -78,33 +78,29 @@ class Audio:
 
     @staticmethod
     def wav_to_mono(wav, output):
-        nChannels = wav.getnchannels()
-        if nChannels == 1:
-            return wav
-
-        bytesPerSample = wav.getsampwidth()
         nFrames = wav.getnframes()
         raw = wav.readframes(nFrames)
+        bytesPerSample = wav.getsampwidth()
+        nChannels = wav.getnchannels()
         data = Audio.extract_samples(
             raw, nChannels, bytesPerSample, nFrames
         )
-        mono = Audio.stereo_to_mono(data)
-        if bytesPerSample == 3:
-            lift = max(max(mono), abs(min(mono))) / 2**16
-            mono = [i // lift for i in mono]
-
         with wave.open(output, mode="wb") as rv:
             rv.setparams(wav.getparams())
-            rv.setnchannels(1)
+
+            if nChannels == 2:
+                data = Audio.stereo_to_mono(data)
+                rv.setnchannels(1)
+            if bytesPerSample == 3:
+                lift = max(max(data), abs(min(data))) / 2**15
+                data = [i // lift for i in data]
+                rv.setsampwidth(2)
+
             try:
                 rv.writeframes(
                     b"".join(
-                        int(i).to_bytes(
-                            bytesPerSample,
-                            byteorder="little",
-                            signed=True
-                        )
-                        for i in mono
+                        int(i).to_bytes(2, byteorder="little", signed=True)
+                        for i in data
                     )
                 )
             except OverflowError as e:
