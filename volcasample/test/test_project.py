@@ -24,6 +24,7 @@ import unittest
 import pkg_resources
 
 from volcasample.project import Project
+from volcasample.syro import Status
 
 
 class NeedsTempDirectory:
@@ -138,9 +139,7 @@ class ProjectCheckTests(CopiesTestData, unittest.TestCase):
 
 class ProjectAssembleTests(CopiesTestData, unittest.TestCase):
 
-    @unittest.skip("Until....")
     def test_assemble_single_slot(self):
         with Project(self.drcty.name, 0, 1) as proj:
-            status = proj.assemble(vote=0)
-
-        print(status)
+            status = proj.assemble(vote=0, locn=self.drcty.name)
+        self.assertIs(status, Status.Success)

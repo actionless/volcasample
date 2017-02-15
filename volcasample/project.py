@@ -139,8 +139,7 @@ class Project:
 
     def __init__(self,path,  start, span):
         self.path, self.start, self.span = path, start, span
-        self._handle = None
-        self._assets = None
+        self._assets = []
 
     def __enter__(self):
         self._assets = []
@@ -151,18 +150,23 @@ class Project:
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        self._handle = None
-        self._assets = None
+        self._assets = []
         return False
 
-    def assemble(self, vote=0):
-        self._handle = volcasample.syro.Handle()
+    def assemble(self, vote=0, locn=None):
+        jobs = OrderedDict([(
+            int(os.path.basename(os.path.dirname(i.metadata["path"]))),
+            (volcasample.syro.DataType.Sample_Erase, i.metadata["path"]))
+            for i in self._assets
+            if i.metadata.get("vote", 0) < vote
+        ])
+        jobs.update(OrderedDict([(
+            int(os.path.basename(os.path.dirname(i.metadata["path"]))),
+            (volcasample.syro.DataType.Sample_Compress, i.metadata["path"]))
+            for i in self._assets
+            if i.metadata.get("vote", 0) >= vote
+        ]))
 
-        patch = volcasample.syro.SamplePacker.build(self._assets)
-        # TODO: Get syrodata initialised to sample No-op
-        # TODO: Turn assets into syrodata
-        # TODO: Pass syrodata into library
-        status = volcasample.syro.SamplePacker.start(self._handle, None)
-        # TODO: Iterate by get_sample over output data
-        status = volcasample.syro.SamplePacker.end(self._handle)
-        print(status)
+        patch = volcasample.syro.SamplePacker.patch(jobs)
+        status = volcasample.syro.SamplePacker.build(patch, locn)
+        return status
