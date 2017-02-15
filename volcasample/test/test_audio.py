@@ -85,3 +85,26 @@ class ConversionTests(unittest.TestCase):
         finally:
             os.close(fD)
             os.remove(fP)
+
+    def test_wav_to_mono_24bit(self):
+        stereoFP  = pkg_resources.resource_filename(
+            "volcasample.test",
+            "data/chinese-gong-daniel_simon.wav"
+        )
+
+        wav, data = ConversionTests.extract_wav_data(stereoFP)
+        self.assertEqual(8388607, max(Audio.find_peaks(data)))
+        self.assertEqual(-8388608, min(Audio.find_peaks(data)))
+
+        fD, fP = tempfile.mkstemp(suffix=".wav")
+        try:
+            with wave.open(stereoFP, "rb") as data:
+                rv = Audio.wav_to_mono(data, fP)
+                self.assertEqual(1, rv.getnchannels())
+
+            wav, data = ConversionTests.extract_wav_data(fP)
+            self.assertEqual(65416, max(Audio.find_peaks(data)))
+            self.assertEqual(-65536, min(Audio.find_peaks(data)))
+        finally:
+            os.close(fD)
+            os.remove(fP)

@@ -88,8 +88,10 @@ class Audio:
         data = Audio.extract_samples(
             raw, nChannels, bytesPerSample, nFrames
         )
-        # TODO: Convert to 16 bit
         mono = Audio.stereo_to_mono(data)
+        if bytesPerSample == 3:
+            lift = max(max(mono), abs(min(mono))) / 2**16
+            mono = [i // lift for i in mono]
 
         with wave.open(output, mode="wb") as rv:
             rv.setparams(wav.getparams())
