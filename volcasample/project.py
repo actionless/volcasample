@@ -147,10 +147,7 @@ class Project:
         for metadata in self.check(
             self.path, self.start, self.span, quiet=self.quiet
         ):
-            print(metadata)
-            with open(metadata["path"], "r+b") as src:
-                data = src.read()
-                self._assets.append(Project.Asset(metadata, data))
+            self._assets.append(metadata)
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -158,19 +155,19 @@ class Project:
         return False
 
     def assemble(self, vote=0, locn=None):
-        #jobs = OrderedDict([(
-        #    int(os.path.basename(os.path.dirname(i.metadata["path"]))),
-        #    (volcasample.syro.DataType.Sample_Erase, i.metadata["path"]))
-        #    for i in self._assets
-        #    if i.metadata.get("vote", 0) < vote
-        #])
-        #jobs.update(OrderedDict([(
-        jobs = (OrderedDict([(
-            int(os.path.basename(os.path.dirname(i.metadata["path"]))),
-            (volcasample.syro.DataType.Sample_Compress, i.metadata["path"]))
+        jobs = OrderedDict([(
+            int(os.path.basename(os.path.dirname(i["path"]))),
+            (volcasample.syro.DataType.Sample_Erase, i["path"]))
             for i in self._assets
-            if i.metadata.get("vote", 0) >= vote
+            if i.get("vote", 0) < vote
+        ])
+        jobs.update(OrderedDict([(
+            int(os.path.basename(os.path.dirname(i["path"]))),
+            (volcasample.syro.DataType.Sample_Compress, i["path"]))
+            for i in self._assets
+            if i.get("vote", 0) >= vote
         ]))
+        print(jobs)
 
         patch = volcasample.syro.SamplePacker.patch(jobs)
         status = volcasample.syro.SamplePacker.build(patch, locn)

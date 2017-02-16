@@ -42,11 +42,14 @@ class CopiesTestData(NeedsTempDirectory):
 
     def setUp(self):
         super().setUp()
-        self.assertEqual(2, Project.create(self.drcty.name, start=0, span=2, quiet=True))
+        self.assertEqual(
+            3,
+            Project.create(self.drcty.name$, start=0, span=3, quiet=True)
+        )
         data = pkg_resources.resource_filename("volcasample.test", "data")
         for src, dst in zip(
             sorted(i for i in os.listdir(data) if i.endswith(".wav")),
-            ("00", "01")
+            ("00", "01", "02")
         ):
             rv = shutil.copy(os.path.join(data, src), os.path.join(self.drcty.name, dst))
 
@@ -144,7 +147,6 @@ class ProjectAssembleTests(CopiesTestData, unittest.TestCase):
             status = proj.assemble(vote=0, locn=self.drcty.name)
         self.assertIs(status, Status.Success)
 
-    @unittest.skip("Segfault")
     def test_assemble_three_slots(self):
         with Project(self.drcty.name, 0, 3, quiet=False) as proj:
             status = proj.assemble(vote=0, locn=self.drcty.name)
