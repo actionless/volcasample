@@ -253,6 +253,30 @@ class SamplePackerTests(unittest.TestCase):
             status = volcasample.syro.SamplePacker.end(handle)
             self.assertIs(status, Status.Success)
 
+    def test_patch_bug(self):
+        """
+        python -m unittest volcasample.test.test_syro.SamplePackerTests.test_patch_bug
+
+        """
+        sample = pkg_resources.resource_filename(
+            "volcasample.test", "data/chinese-gong-daniel_simon.wav"
+        )
+        jobs = OrderedDict([
+            (0, (DataType.Sample_Compress, sample))
+        ])
+        patch = volcasample.syro.SamplePacker.patch(jobs)
+        self.assertIsInstance(patch, SyroData * 1)
+        self.assertEqual(1, patch[0].DataType)
+        fD, fP = tempfile.mkstemp(suffix=".wav")
+        try:
+            status = volcasample.syro.SamplePacker.build(
+                patch, *os.path.split(fP)
+            )
+            self.assertIs(status, Status.Success)
+        finally:
+            os.close(fD)
+            os.remove(fP)
+
     def test_patch(self):
         sample = pkg_resources.resource_filename(
             "volcasample.test", "data/pcm1608m.wav"

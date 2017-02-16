@@ -144,8 +144,8 @@ class ProjectAssembleTests(CopiesTestData, unittest.TestCase):
             status = proj.assemble(vote=0, locn=self.drcty.name)
         self.assertIs(status, Status.Success)
 
-    #@unittest.skip("Segfault")
+    @unittest.skip("Segfault")
     def test_assemble_three_slots(self):
-        with Project(self.drcty.name, 0, 2, quiet=False) as proj:
+        with Project(self.drcty.name, 0, 3, quiet=False) as proj:
             status = proj.assemble(vote=0, locn=self.drcty.name)
         self.assertIs(status, Status.Success)
