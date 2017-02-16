@@ -167,7 +167,6 @@ class Project:
             for i in self._assets
             if i.get("vote", 0) >= vote
         ]))
-        print(jobs)
 
         patch = volcasample.syro.SamplePacker.patch(jobs)
         status = volcasample.syro.SamplePacker.build(patch, locn)

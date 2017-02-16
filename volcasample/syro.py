@@ -95,6 +95,8 @@ class SamplePacker:
     def build(patch, locn=None, output="volcasamples.wav"):
         locn = locn or os.path.expanduser("~")
         handle = Handle()
+        for i in patch:
+            print(*["{0} {1}".format(f[0], getattr(i, f[0])) for f in type(i)._fields_], sep="\n")
         try:
             nFrames = SamplePacker.start(handle, patch, len(patch))
             rv = list(SamplePacker.get_samples(handle, nFrames))

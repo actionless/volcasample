@@ -44,7 +44,7 @@ class CopiesTestData(NeedsTempDirectory):
         super().setUp()
         self.assertEqual(
             3,
-            Project.create(self.drcty.name$, start=0, span=3, quiet=True)
+            Project.create(self.drcty.name, start=0, span=3, quiet=True)
         )
         data = pkg_resources.resource_filename("volcasample.test", "data")
         for src, dst in zip(
