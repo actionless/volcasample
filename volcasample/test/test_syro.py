@@ -192,7 +192,7 @@ class SamplePackerTests(unittest.TestCase):
         patch[0].DataType = DataType.Sample_Compress.value
         patch[0].Number = 1
         patch[0].Quality = 16
-        patch[0].pData = point_to_bytememory(b"")
+        patch[0].pData = ctypes.c_char_p(b"")
         patch[0].Size = 0
         handle = Handle()
         try:
@@ -207,7 +207,7 @@ class SamplePackerTests(unittest.TestCase):
         data = sinedata(800)
         self.assertEqual(88200, len(data))
         patch[0].Number = 0
-        patch[0].pData = point_to_bytememory(data)
+        patch[0].pData = ctypes.c_char_p(data)
         patch[0].Size = len(data)
         patch[0].Quality = 16
         patch[0].Fs = 44100
@@ -281,7 +281,7 @@ class SamplePackerTests(unittest.TestCase):
         patch = (SyroData * 1)()
         data = sinedata(440)
         patch[0].Number = 0
-        patch[0].pData = point_to_bytememory(data)
+        patch[0].pData = ctypes.c_char_p(data)
         patch[0].Size = len(data)
         patch[0].Quality = 16
         patch[0].Fs = 44100
@@ -320,7 +320,7 @@ class SamplePackerTests(unittest.TestCase):
         with wave.open(sample, "rb") as wav:
             data = wav.readframes(wav.getnframes())
         patch[0].Number = 0
-        patch[0].pData = point_to_bytememory(data)
+        patch[0].pData = ctypes.c_char_p(data)
         patch[0].Size = len(data)
         patch[0].Quality = 8 * wav.getsampwidth()
         patch[0].Fs = wav.getframerate()

@@ -77,7 +77,7 @@ class SyroData(ctypes.Structure):
 
     _fields_  = [
         ("DataType", ctypes.c_uint32),
-        ("pData", ctypes.POINTER(ctypes.c_uint8)),
+        ("pData", ctypes.c_char_p),
         ("Number", ctypes.c_uint32),
         ("Size", ctypes.c_uint32),
         ("Quality", ctypes.c_uint32),
@@ -125,7 +125,7 @@ class SamplePacker:
             if dt == DataType.Sample_Compress:
                 with wave.open(fP, "rb") as wav:
                     data = wav.readframes(wav.getnframes())
-                rv[i].pData = point_to_bytememory(data)
+                rv[i].pData = ctypes.c_char_p(data)
                 rv[i].Size = len(data)
                 rv[i].Quality = 8 * wav.getsampwidth()
                 rv[i].Fs = wav.getframerate()

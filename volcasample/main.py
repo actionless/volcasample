@@ -44,7 +44,7 @@ def main(args):
     elif args.command == "project":
         if args.assemble:
             with Project(args.project, args.start, args.span) as proj:
-                proj.assemble(args.vote)
+                status = proj.assemble(int(args.vote))
 
             print(proj._assets)
 

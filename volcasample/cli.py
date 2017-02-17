@@ -87,7 +87,7 @@ def add_project_options(parser):
         
     )
     parser.add_argument(
-        "--vote", required=False, type=str,
+        "--vote", required=False, type=str, default=0,
         help=(
             "Change your vote on an audio file. "
             "Use +1, -1 to adjust the vote up or down. "
