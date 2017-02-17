@@ -38,10 +38,7 @@ def pick_lib(pkg="volcasample", locn="lib"):
 
 
 def point_to_bytememory(data):
-	return ctypes.cast(
-        ctypes.c_char_p(data),
-		ctypes.POINTER(ctypes.c_uint8)
-	)
+	return ctypes.cast(data, ctypes.POINTER(ctypes.c_uint8))
 
 
 @enum.unique
