@@ -46,8 +46,6 @@ def main(args):
             with Project(args.project, args.start, args.span) as proj:
                 status = proj.assemble(int(args.vote))
 
-            print(proj._assets)
-
         elif args.new:
             # TODO: ingest from CLI args
             Project.create(
