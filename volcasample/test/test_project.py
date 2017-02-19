@@ -148,6 +148,6 @@ class ProjectAssembleTests(CopiesTestData, unittest.TestCase):
         self.assertIs(status, Status.Success)
 
     def test_assemble_three_slots(self):
-        with Project(self.drcty.name, 0, 3, quiet=False) as proj:
+        with Project(self.drcty.name, 0, 3, quiet=True) as proj:
             status = proj.assemble(vote=0, locn=self.drcty.name)
         self.assertIs(status, Status.Success)

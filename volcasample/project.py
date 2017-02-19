@@ -137,6 +137,26 @@ class Project:
             Project.progress_point(n, quiet=quiet)
         Project.progress_point(quiet=quiet)
 
+    def audition(path, start=0, span=None, quiet=False):
+        stop = min(100, (start + span) if span is not None else 101)
+        Project.progress_point(
+            "Auditioning project at {0}".format(path),
+            quiet=quiet
+        )
+        tgts =  sorted(glob.glob(os.path.join(path, "??", "*.wav")))
+        for tgt in tgts[start:stop]:
+            n = int(os.path.basename(os.path.dirname(tgt)))
+            wav = wave.open(tgt, "rb")
+            rv = Audio.play(wav)
+            if rv is None:
+                return
+            else:
+                rv.wait_done()
+
+            Project.progress_point(n, quiet=quiet)
+
+            yield wav
+
     def __init__(self,path, start, span, quiet=True):
         self.path, self.start, self.span = path, start, span
         self.quiet = quiet

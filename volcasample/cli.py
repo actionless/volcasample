@@ -35,6 +35,20 @@ DFLT_LOCN = os.path.expanduser(os.path.join("~", "volcasamples"))
 
 def add_common_options(parser):
     parser.add_argument(
+        "--project", default=DFLT_LOCN,
+        help="path to project directory [{}]".format(DFLT_LOCN)
+    )
+    parser.add_argument(
+        "--start", required=False,
+        type=int, choices=range(0, 100), default=0,
+        help="Select the project index to begin at."
+    )
+    parser.add_argument(
+        "--span", required=False,
+        type=int, choices=range(0, 100), default=None,
+        help="Select the number of slots to operate on."
+    )
+    parser.add_argument(
         "--version", action="store_true", default=False,
         help="Print the current version number")
     parser.add_argument(
@@ -51,28 +65,6 @@ def add_project_options(parser):
     parser.add_argument(
         "--new", action="store_true", default=False,
         help="Create a new project."
-    )
-    parser.add_argument(
-        "--project", default=DFLT_LOCN,
-        help="path to project directory [{}]".format(DFLT_LOCN)
-    )
-    parser.add_argument(
-        "--start", required=False,
-        type=int, choices=range(0, 100), default=0,
-        help="Select the project index to begin at."
-    )
-    parser.add_argument(
-        "--span", required=False,
-        type=int, choices=range(0, 100), default=None,
-        help="Select the number of slots to operate on."
-    )
-    parser.add_argument(
-        "--refresh", action="store_true", default=False,
-        help="Refresh metadata from audio file(s) in the project."
-    )
-    parser.add_argument(
-        "--preview", action="store_true", default=False,
-        help="Play the audio file(s) from the project."
     )
     parser.add_argument(
         "--check", action="store_true", default=False,
@@ -98,8 +90,8 @@ def add_project_options(parser):
 
 def add_audio_options(parser):
     parser.add_argument(
-        "--delete", action="store_true", default=False,
-        help="Delete original audio file after successful conversion."
+        "--audition", action="store_true", default=False,
+        help="Play the audio file(s) from the project."
     )
     parser.add_argument(
         "audio", nargs="*",

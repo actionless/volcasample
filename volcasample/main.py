@@ -37,10 +37,12 @@ This module provides a workflow for a Volca Sample project.
 
 def main(args):
     if args.command == "audio":
-        for path in args.samples:
-            w = wave.open(path, "rb")
-            params = w.getparams()
-            print(Audio.metadata(params, path=os.path.abspath(path)))
+        if args.audition:
+            list(Project.audition(
+                args.project,
+                start=args.start,
+                span=args.span
+            ))
     elif args.command == "project":
         if args.assemble:
             with Project(args.project, args.start, args.span) as proj:
@@ -53,12 +55,6 @@ def main(args):
                 start=args.start,
                 span=args.span
             )
-        elif args.refresh:
-            list(Project.refresh(
-                args.project,
-                start=args.start,
-                span=args.span
-            ))
         elif args.vote:
             try:
                 val = int(args.vote)

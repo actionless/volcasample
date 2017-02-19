@@ -25,9 +25,9 @@ import wave
 import pkg_resources
 
 try:
-    import simplesound
+    import simpleaudio
 except ImportError:
-    simplesound = None
+    simpleaudio = None
 
 class Audio:
 
@@ -108,3 +108,35 @@ class Audio:
                 print(max(mono))
                 raise
             return rv
+
+    @staticmethod
+    def play(wav, pos=0, durn=None):
+        if simpleaudio is None:
+            print(
+                "You installed without [audio] dependencies. "
+                "You cannot play audio files."
+            )
+            return None
+
+        nChannels = wav.getnchannels()
+        bytesPerSample = wav.getsampwidth()
+        sampleRate = wav.getframerate()
+        nFrames = wav.getnframes()
+        framesPerMilliSecond = nChannels * sampleRate // 1000
+
+        offset = framesPerMilliSecond * pos
+        duration = nFrames - offset
+        if duration <= 0:
+            print("Start beyond limits.", file=sys.stderr)
+            return 0
+
+        duration = min(
+            duration,
+            framesPerMilliSecond * durn if durn is not None else duration
+        )
+
+        data.readframes(offset)
+
+        frames = data.readframes(duration)
+        waveObj = simpleaudio.WaveObject(frames, nChannels, bytesPerSample, sampleRate)
+        return waveObj.play()
