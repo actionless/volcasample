@@ -135,8 +135,8 @@ class Audio:
             framesPerMilliSecond * durn if durn is not None else duration
         )
 
-        data.readframes(offset)
+        wav.readframes(offset)
 
-        frames = data.readframes(duration)
+        frames = wav.readframes(duration)
         waveObj = simpleaudio.WaveObject(frames, nChannels, bytesPerSample, sampleRate)
         return waveObj.play()
