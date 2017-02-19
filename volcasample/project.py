@@ -146,6 +146,8 @@ class Project:
         tgts =  sorted(glob.glob(os.path.join(path, "??", "*.wav")))
         for tgt in tgts[start:stop]:
             n = int(os.path.basename(os.path.dirname(tgt)))
+            Project.progress_point(n, quiet=quiet)
+
             wav = wave.open(tgt, "rb")
             rv = Audio.play(wav)
             if rv is None:
@@ -153,9 +155,8 @@ class Project:
             else:
                 rv.wait_done()
 
-            Project.progress_point(n, quiet=quiet)
-
             yield wav
+        Project.progress_point(quiet=quiet)
 
     def __init__(self,path, start, span, quiet=True):
         self.path, self.start, self.span = path, start, span
