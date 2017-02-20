@@ -18,6 +18,7 @@
 
 from collections import OrderedDict
 from collections import namedtuple
+import functools
 import glob
 import json
 import os
@@ -35,13 +36,25 @@ This module provides a workflow for a Volca Sample project.
 class Project:
 
     Asset = namedtuple("Asset", ["metadata", "data"])
+    plot = functools.partial(
+        print, sep="", end="", file=sys.stderr, flush=True
+    )
 
     @staticmethod
-    def scale():
-        print(*[i // 10 for i in range(100)], sep="", end="", file=sys.stderr, flush=True)
-        print("", file=sys.stderr, flush=True)
-        print(*[i % 10 for i in range(100)], sep="", end="", file=sys.stderr, flush=True)
-        print("\n", file=sys.stderr, flush=True)
+    def scale(n=100):
+        Project.plot(*[i // 10 for i in range(n)])
+        Project.plot("\n")
+        Project.plot(*[i % 10 for i in range(n)])
+        Project.plot("\n")
+
+    @staticmethod
+    def weights(path, start=0, span=None, quiet=False):
+        details = Project.refresh(path, start=0, span=None, quiet=True)
+        sizes = [i["nframes"] for i in details]
+        ramp = "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\|()1{}[]?-_+~<>i!lI;:,\"^`'. "
+        width = (max(sizes) - min(sizes)) // len(ramp)
+        offset = min(sizes)
+        return [ramp[-int((i - offset) / width)] for i in sizes]
 
     @staticmethod
     def progress_point(n=None, clear=2, quiet=False):
@@ -81,12 +94,20 @@ class Project:
             "Refreshing project at {0}".format(path),
             quiet=quiet
         )
-        tgts =  sorted(glob.glob(os.path.join(path, "??", "*.wav")))
-        for tgt in tgts[start:stop]:
+        tgts = (
+            os.path.join(path, "{0:02}".format(i), "*.wav")
+            for i in range(start, stop)
+        )
+        for tgt in tgts:
             n = int(os.path.basename(os.path.dirname(tgt)))
-            w = wave.open(tgt, "rb")
-            params = w.getparams()
-            metadata = Audio.metadata(params, tgt)
+
+            try:
+                src = next(iter(glob.glob(tgt)))
+                w = wave.open(tgt, "rb")
+                params = w.getparams()
+                metadata = Audio.metadata(params, tgt)
+            except (FileNotFoundError, StopIteration):
+                metadata = {}
 
             # Try to load previous metadata
             slot = os.path.dirname(tgt)
@@ -96,7 +117,7 @@ class Project:
                 with open(fP, "r") as prev:
                     history = json.load(prev)
             except FileNotFoundError:
-                history = OrderedDict([("vote", 0)])
+                history = OrderedDict([("slot", n), ("vote", 0)])
 
             history.update(metadata)
             Project.progress_point(n, quiet=quiet)
@@ -109,21 +130,21 @@ class Project:
 
     @staticmethod
     def vote(path, val=None, incr=0, start=0, span=None, quiet=False):
+        stop = min(100, (start + span) if span is not None else 101)
         tgts = list(Project.refresh(path, start, span, quiet))
 
-        for tgt in tgts:
+        for n, tgt in zip(range(start, stop), tgts):
             tgt["vote"] = val if isinstance(val, int) else tgt["vote"] + incr
             Project.progress_point(
-                "{0} vote{1} for slot {2}. Value is {3}".format(
+                "{0} vote{1} for slot {2:02}. Value is {3}".format(
                     "Checked" if not (val or incr) else "Applied",
                     " increment" if val is None and incr else "",
-                    os.path.basename(os.path.dirname(tgt["path"])),
-                    tgt["vote"]
+                    n, tgt.get("vote", 0)
                 ),
                 quiet=quiet
             )
 
-            metadata = os.path.join(os.path.dirname(tgt["path"]), "metadata.json")
+            metadata = os.path.join(path, "{0:02}".format(n), "metadata.json")
             with open(metadata, "w") as new:
                 json.dump(tgt, new, indent=0, sort_keys=True)
 
@@ -131,10 +152,10 @@ class Project:
 
     @staticmethod
     def check(path, start=0, span=None, quiet=False):
+        stop = min(100, (start + span) if span is not None else 101)
         tgts = list(Project.refresh(path, start, span, quiet=True))
-        for tgt in tgts:
-            n = int(os.path.basename(os.path.dirname(tgt["path"])))
-            if tgt["nchannels"] > 1 or tgt["sampwidth"] > 2:
+        for n, tgt in zip(range(start, stop), tgts):
+            if tgt.get("nchannels", 0) > 1 or tgt.get("sampwidth", 0) > 2:
                 fP = os.path.splitext(tgt["path"])[0] + ".ref"
                 os.replace(tgt["path"], fP)
                 with wave.open(fP, "rb") as wav:
@@ -151,7 +172,8 @@ class Project:
             quiet=quiet
         )
         Project.scale()
-        tgts =  sorted(glob.glob(os.path.join(path, "??", "*.wav")))
+        Project.plot(*Project.weights(path, start=0, span=None, quiet=False))
+        tgts = sorted(glob.glob(os.path.join(path, "??", "*.wav")))
         for tgt in tgts[start:stop]:
             n = int(os.path.basename(os.path.dirname(tgt)))
             Project.progress_point(n, quiet=quiet)
@@ -185,18 +207,20 @@ class Project:
 
     def assemble(self, vote=0, locn=None):
         jobs = OrderedDict([(
-            int(os.path.basename(os.path.dirname(i["path"]))),
+            i["slot"],
             (volcasample.syro.DataType.Sample_Erase, i["path"]))
             for i in self._assets
-            if i.get("vote", 0) < vote
+            if "path" in i and i.get("vote", 0) < vote
         ])
         jobs.update(OrderedDict([(
-            int(os.path.basename(os.path.dirname(i["path"]))),
+            i["slot"],
             (volcasample.syro.DataType.Sample_Compress, i["path"]))
             for i in self._assets
-            if i.get("vote", 0) >= vote
+            if "path" in i and i.get("vote", 0) >= vote
         ]))
+        print(jobs)
 
-        patch = volcasample.syro.SamplePacker.patch(jobs)
-        status = volcasample.syro.SamplePacker.build(patch, locn)
-        return status
+        if jobs:
+            patch = volcasample.syro.SamplePacker.patch(jobs)
+            status = volcasample.syro.SamplePacker.build(patch, locn)
+            return status

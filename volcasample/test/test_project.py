@@ -76,7 +76,7 @@ class ProjectCreateTests(NeedsTempDirectory, unittest.TestCase):
 class ProjectRefreshTests(CopiesTestData, unittest.TestCase):
 
     def test_refresh_no_history(self):
-        rv = list(Project.refresh(self.drcty.name, quiet=True))
+        rv = list(Project.refresh(self.drcty.name, start=0, span=3, quiet=True))
         for metadata in rv:
             self.assertTrue(all(i in metadata for i in (
                 "path", "vote", "nchannels", "sampwidth"
