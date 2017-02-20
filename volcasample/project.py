@@ -98,19 +98,17 @@ class Project:
             os.path.join(path, "{0:02}".format(i), "*.wav")
             for i in range(start, stop)
         )
-        for tgt in tgts:
-            n = int(os.path.basename(os.path.dirname(tgt)))
-
+        for n, tgt in zip(range(start, stop), tgts):
             try:
                 src = next(iter(glob.glob(tgt)))
-                w = wave.open(tgt, "rb")
+                w = wave.open(src, "rb")
                 params = w.getparams()
-                metadata = Audio.metadata(params, tgt)
+                metadata = Audio.metadata(params, src)
             except (FileNotFoundError, StopIteration):
                 metadata = {}
 
             # Try to load previous metadata
-            slot = os.path.dirname(tgt)
+            slot = os.path.dirname(src)
             fP = os.path.join(slot, "metadata.json")
 
             try:
