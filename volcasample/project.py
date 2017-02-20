@@ -21,6 +21,7 @@ from collections import namedtuple
 import functools
 import glob
 import json
+import math
 import os
 import sys
 import wave
@@ -48,13 +49,13 @@ class Project:
         Project.plot("\n")
 
     @staticmethod
-    def weights(path, start=0, span=None, quiet=False):
-        details = Project.refresh(path, start=0, span=None, quiet=True)
-        sizes = [i["nframes"] for i in details]
-        ramp = "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\|()1{}[]?-_+~<>i!lI;:,\"^`'. "
-        width = (max(sizes) - min(sizes)) // len(ramp)
+    def weights(path, nBins, start=0, span=None, quiet=False, details=None):
+        details = details or Project.refresh(path, start=start, span=span, quiet=True)
+        sizes = [math.log(i.get("nframes", 1)) for i in details]
+        #sizes = [i.get("nframes", 0) for i in details]
+        width = (max(sizes) - min(sizes)) / (nBins - 1)
         offset = min(sizes)
-        return [ramp[-int((i - offset) / width)] for i in sizes]
+        return [int((i - offset) / width) for i in sizes]
 
     @staticmethod
     def progress_point(n=None, clear=2, quiet=False):
@@ -68,7 +69,7 @@ class Project:
             msg = " OK."
         else:
             msg = n
-            end = "\n" * clear
+            end = "" if len(n) == 1 else "\n" * clear
         print(msg, end=end, file=sys.stderr, flush=True)
 
     @staticmethod
@@ -108,8 +109,9 @@ class Project:
                 metadata = {}
 
             # Try to load previous metadata
-            slot = os.path.dirname(src)
-            fP = os.path.join(slot, "metadata.json")
+            fP = os.path.join(
+                path, "{0:02}".format(n), "metadata.json"
+            )
 
             try:
                 with open(fP, "r") as prev:
@@ -169,21 +171,29 @@ class Project:
             "Auditioning project at {0}".format(path),
             quiet=quiet
         )
+        tgts = list(Project.refresh(path, start, span, quiet=True))
+
         Project.scale()
-        Project.plot(*Project.weights(path, start=0, span=None, quiet=False))
-        tgts = sorted(glob.glob(os.path.join(path, "??", "*.wav")))
-        for tgt in tgts[start:stop]:
-            n = int(os.path.basename(os.path.dirname(tgt)))
-            Project.progress_point(n, quiet=quiet)
-
-            wav = wave.open(tgt, "rb")
-            rv = Audio.play(wav)
-            if rv is None:
-                return
+        ramp = "..~mBB"
+        weights = list(Project.weights(
+            path, len(ramp), start=start, span=span, quiet=False,
+            details=tgts
+        ))
+        Project.plot("\n")
+        
+        for n, weight, tgt in zip(range(start, stop), weights, tgts):
+            if "path" in tgt:
+                Project.progress_point(ramp[weight], quiet=quiet)
+                wav = wave.open(tgt["path"], "rb")
+                rv = Audio.play(wav)
+                if rv is None:
+                    return
+                else:
+                    rv.wait_done()
+                    yield wav
             else:
-                rv.wait_done()
-
-            yield wav
+                Project.progress_point(" ", quiet=quiet)
+                yield None
         Project.progress_point(quiet=quiet)
 
     def __init__(self,path, start, span, quiet=True):
@@ -216,7 +226,6 @@ class Project:
             for i in self._assets
             if "path" in i and i.get("vote", 0) >= vote
         ]))
-        print(jobs)
 
         if jobs:
             patch = volcasample.syro.SamplePacker.patch(jobs)
