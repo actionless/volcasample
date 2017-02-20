@@ -120,9 +120,9 @@ def parsers(description=__doc__):
     p = add_project_options(p)
 
     p = subparsers.add_parser(
-        "audio",
-        help="Volca Sample 'audio' command.",
-        description="Operates on audio files."
+        "audition",
+        help="Volca Sample 'audition' command.",
+        description="Listen to project audio."
     )
-    p = add_audio_options(p)
+    #p = add_audio_options(p)
     return (rv, subparsers)

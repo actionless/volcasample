@@ -37,6 +37,13 @@ class Project:
     Asset = namedtuple("Asset", ["metadata", "data"])
 
     @staticmethod
+    def scale():
+        print(*[i // 10 for i in range(100)], sep="", end="", file=sys.stderr, flush=True)
+        print("", file=sys.stderr, flush=True)
+        print(*[i % 10 for i in range(100)], sep="", end="", file=sys.stderr, flush=True)
+        print("\n", file=sys.stderr, flush=True)
+
+    @staticmethod
     def progress_point(n=None, clear=2, quiet=False):
         if quiet:
             return
@@ -143,6 +150,7 @@ class Project:
             "Auditioning project at {0}".format(path),
             quiet=quiet
         )
+        Project.scale()
         tgts =  sorted(glob.glob(os.path.join(path, "??", "*.wav")))
         for tgt in tgts[start:stop]:
             n = int(os.path.basename(os.path.dirname(tgt)))

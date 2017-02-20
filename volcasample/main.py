@@ -36,13 +36,12 @@ This module provides a workflow for a Volca Sample project.
 """
 
 def main(args):
-    if args.command == "audio":
-        if args.audition:
-            list(Project.audition(
-                args.project,
-                start=args.start,
-                span=args.span
-            ))
+    if args.command == "audition":
+        list(Project.audition(
+            args.project,
+            start=args.start,
+            span=args.span
+        ))
     elif args.command == "project":
         if args.assemble:
             with Project(args.project, args.start, args.span) as proj:
