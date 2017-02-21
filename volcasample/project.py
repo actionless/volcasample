@@ -182,7 +182,7 @@ class Project:
 
         def grade(
             nFrames,
-            breaks=[1, 10 * 1024, 20 * 1024, 100 * 1024, 2 * 1024 * 1024],
+            breaks=[1, 20 * 1024, 100 * 1024, 500 * 1024, 2 * 1024 * 1024],
             ramp=" .:iI#"
         ):
             return ramp[bisect.bisect(breaks, nFrames)]
