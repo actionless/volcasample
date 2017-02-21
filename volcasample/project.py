@@ -63,6 +63,29 @@ class Project:
         print(msg, end=end, file=sys.stderr, flush=True)
 
     @staticmethod
+    def parse_initial(text):
+        return OrderedDict([
+            (int(f + s), {" ": None, "x": False}.get(t.lower(), True))
+            for f, s, t in zip(*text.splitlines())
+        ])
+        
+    @staticmethod
+    def optimise(targets, initial, vote):
+        jobs = OrderedDict([(
+            i["slot"],
+            (volcasample.syro.DataType.Sample_Erase, i["path"]))
+            for i in targets
+            if "path" in i and initial.get(i["slot"], None) is False
+        ])
+        jobs.update(OrderedDict([(
+            i["slot"],
+            (volcasample.syro.DataType.Sample_Compress, i["path"]))
+            for i in targets
+            if "path" in i and initial.get(i["slot"], None) is True
+        ]))
+        return jobs
+
+    @staticmethod
     def create(path, start=0, span=None, quiet=False):
         stop = min(100, (start + span) if span is not None else 101)
         Project.progress_point(
@@ -210,19 +233,8 @@ class Project:
         self._assets = []
         return False
 
-    def assemble(self, locn, instructions=[], vote=0):
-        jobs = OrderedDict([(
-            i["slot"],
-            (volcasample.syro.DataType.Sample_Erase, i["path"]))
-            for i in self._assets
-            if "path" in i and i.get("vote", 0) < vote
-        ])
-        jobs.update(OrderedDict([(
-            i["slot"],
-            (volcasample.syro.DataType.Sample_Compress, i["path"]))
-            for i in self._assets
-            if "path" in i and i.get("vote", 0) >= vote
-        ]))
+    def assemble(self, locn, initial=[], vote=0, optimiser=optimise):
+        jobs = optimiser(self._assets, initial, vote)
 
         if jobs:
             patch = volcasample.syro.SamplePacker.patch(jobs)

@@ -144,13 +144,18 @@ class ProjectCheckTests(CopiesTestData, unittest.TestCase):
 class ProjectAssembleTests(CopiesTestData, unittest.TestCase):
 
     def test_parse_instructions(self):
-        instr = textwrap.dedent("""
+        text = textwrap.dedent("""
         00000000001111111111
         01234567890123456789
-        ...~...      XXXXXXX
+        ..X~...      XXXXXXX
         """
-        ).lstrip().splitlines()
-        self.fail(instr)
+        ).lstrip()
+        initial = Project.parse_initial(text)
+        targets = list(Project.refresh(
+            self.drcty.name, start=0, span=3, quiet=True
+        ))
+        jobs = Project.optimise(targets, initial, 0)
+        self.fail(jobs)
 
     def test_assemble_single_slot(self):
         with Project(self.drcty.name, 0, 1) as proj:
