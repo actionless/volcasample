@@ -16,12 +16,12 @@
 # You should have received a copy of the GNU General Public License
 # along with volcasample.  If not, see <http://www.gnu.org/licenses/>.
 
+import bisect
 from collections import OrderedDict
 from collections import namedtuple
 import functools
 import glob
 import json
-import math
 import os
 import sys
 import wave
@@ -36,7 +36,6 @@ This module provides a workflow for a Volca Sample project.
 
 class Project:
 
-    Asset = namedtuple("Asset", ["metadata", "data"])
     plot = functools.partial(
         print, sep="", end="", file=sys.stderr, flush=True
     )
@@ -47,15 +46,6 @@ class Project:
         Project.plot("\n")
         Project.plot(*[i % 10 for i in range(n)])
         Project.plot("\n")
-
-    @staticmethod
-    def weights(path, nBins, start=0, span=None, quiet=False, details=None):
-        details = details or Project.refresh(path, start=start, span=span, quiet=True)
-        sizes = [math.log(i.get("nframes", 1)) for i in details]
-        #sizes = [i.get("nframes", 0) for i in details]
-        width = (max(sizes) - min(sizes)) / (nBins - 1)
-        offset = min(sizes)
-        return [int((i - offset) / width) for i in sizes]
 
     @staticmethod
     def progress_point(n=None, clear=2, quiet=False):
@@ -165,7 +155,15 @@ class Project:
             Project.progress_point(n, quiet=quiet)
         Project.progress_point(quiet=quiet)
 
-    def audition(path, start=0, span=None, quiet=False):
+    def audition(path, start=0, span=None, quiet=False, silent=False):
+
+        def grade(
+            nFrames,
+            breaks=[1, 10 * 1024, 20 * 1024, 100 * 1024, 2 * 1024 * 1024],
+            ramp=" .:iI#"
+        ):
+            return ramp[bisect.bisect(breaks, nFrames)]
+
         stop = min(100, (start + span) if span is not None else 101)
         Project.progress_point(
             "Auditioning project at {0}".format(path),
@@ -174,23 +172,22 @@ class Project:
         tgts = list(Project.refresh(path, start, span, quiet=True))
 
         Project.scale()
-        ramp = "..~mBB"
-        weights = list(Project.weights(
-            path, len(ramp), start=start, span=span, quiet=False,
-            details=tgts
-        ))
-        Project.plot("\n")
+        # 4 MB, 65s
+       
         
-        for n, weight, tgt in zip(range(start, stop), weights, tgts):
+        grades = [grade(tgt.get("nframes", 0)) for tgt in tgts]
+        
+        for n, grd, tgt in zip(range(start, stop), grades, tgts):
             if "path" in tgt:
-                Project.progress_point(ramp[weight], quiet=quiet)
+                Project.progress_point(grd, quiet=quiet)
                 wav = wave.open(tgt["path"], "rb")
-                rv = Audio.play(wav)
-                if rv is None:
-                    return
-                else:
-                    rv.wait_done()
-                    yield wav
+                if not silent:
+                    rv = Audio.play(wav)
+                    if rv is None:
+                        return
+                    else:
+                        rv.wait_done()
+                yield wav
             else:
                 Project.progress_point(" ", quiet=quiet)
                 yield None
@@ -214,7 +211,6 @@ class Project:
         return False
 
     def assemble(self, locn, instructions=[], vote=0):
-        "4 MB, 65s"
         jobs = OrderedDict([(
             i["slot"],
             (volcasample.syro.DataType.Sample_Erase, i["path"]))

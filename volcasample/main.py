@@ -40,7 +40,8 @@ def main(args):
         list(Project.audition(
             args.project,
             start=args.start,
-            span=args.span
+            span=args.span,
+            silent=args.silent
         ))
     elif args.command == "project":
         if args.assemble:
