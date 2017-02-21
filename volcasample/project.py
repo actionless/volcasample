@@ -213,7 +213,8 @@ class Project:
         self._assets = []
         return False
 
-    def assemble(self, vote=0, locn=None):
+    def assemble(self, locn, instructions=[], vote=0):
+        "4 MB, 65s"
         jobs = OrderedDict([(
             i["slot"],
             (volcasample.syro.DataType.Sample_Erase, i["path"]))

@@ -19,6 +19,7 @@
 import os.path
 import shutil
 import tempfile
+import textwrap
 import unittest
 
 import pkg_resources
@@ -141,6 +142,15 @@ class ProjectCheckTests(CopiesTestData, unittest.TestCase):
         self.assertTrue(os.path.isfile(os.path.join(os.path.splitext(rv["path"])[0] + ".ref")))
 
 class ProjectAssembleTests(CopiesTestData, unittest.TestCase):
+
+    def test_parse_instructions(self):
+        instr = textwrap.dedent("""
+        00000000001111111111
+        01234567890123456789
+        ...~...      XXXXXXX
+        """
+        ).lstrip().splitlines()
+        self.fail(instr)
 
     def test_assemble_single_slot(self):
         with Project(self.drcty.name, 0, 1) as proj:
