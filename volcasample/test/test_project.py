@@ -154,15 +154,15 @@ class ProjectAssembleTests(CopiesTestData, unittest.TestCase):
         targets = list(Project.refresh(
             self.drcty.name, start=0, span=3, quiet=True
         ))
-        jobs = Project.optimise(targets, initial, 0)
-        self.fail(jobs)
+        jobs = Project.optimise(targets, initial.values(), 0)
+        self.assertEqual([2, 0, 1], list(jobs.keys()))
 
     def test_assemble_single_slot(self):
         with Project(self.drcty.name, 0, 1) as proj:
-            status = proj.assemble(vote=0, locn=self.drcty.name)
+            status = proj.assemble(initial=[True], locn=self.drcty.name)
         self.assertIs(status, Status.Success)
 
     def test_assemble_three_slots(self):
         with Project(self.drcty.name, 0, 3, quiet=True) as proj:
-            status = proj.assemble(vote=0, locn=self.drcty.name)
+            status = proj.assemble(initial=[True] * 3, locn=self.drcty.name)
         self.assertIs(status, Status.Success)

@@ -74,11 +74,6 @@ def add_project_options(parser):
         )
     )
     parser.add_argument(
-        "--assembly",
-        nargs="?", type=argparse.FileType('r'), default=sys.stdin,
-        help="Create an upload file for the Volca."
-    )
-    parser.add_argument(
         "--vote", required=False, type=str, default=0,
         help=(
             "Change your vote on an audio file. "
@@ -92,6 +87,18 @@ def add_audition_options(parser):
     parser.add_argument(
         "--silent", action="store_true", default=False,
         help="Don't play project audio file(s)."
+    )
+    return parser
+
+def add_patch_options(parser):
+    parser.add_argument(
+        "instructions",
+        nargs="?", type=argparse.FileType('r'), default=sys.stdin,
+        help="Define patch instructions."
+    )
+    parser.add_argument(
+        "--silent", action="store_true", default=False,
+        help="Don't play patch file."
     )
     return parser
 
@@ -121,4 +128,12 @@ def parsers(description=__doc__):
         description="Listen to project audio."
     )
     p = add_audition_options(p)
+
+    p = subparsers.add_parser(
+        "patch",
+        help="Volca Sample 'patch' command.",
+        description="Create a patch for your Volca."
+    )
+    p = add_patch_options(p)
+
     return (rv, subparsers)

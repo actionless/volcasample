@@ -70,18 +70,18 @@ class Project:
         ])
         
     @staticmethod
-    def optimise(targets, initial, vote):
+    def optimise(targets, initial:list, vote):
         jobs = OrderedDict([(
-            i["slot"],
-            (volcasample.syro.DataType.Sample_Erase, i["path"]))
-            for i in targets
-            if "path" in i and initial.get(i["slot"], None) is False
+            tgt["slot"],
+            (volcasample.syro.DataType.Sample_Erase, tgt["path"]))
+            for tgt, keep in zip(targets, initial)
+            if "path" in tgt and keep is False
         ])
         jobs.update(OrderedDict([(
-            i["slot"],
-            (volcasample.syro.DataType.Sample_Compress, i["path"]))
-            for i in targets
-            if "path" in i and initial.get(i["slot"], None) is True
+            tgt["slot"],
+            (volcasample.syro.DataType.Sample_Compress, tgt["path"]))
+            for tgt, keep in zip(targets, initial)
+            if "path" in tgt and keep is True
         ]))
         return jobs
 
@@ -233,7 +233,8 @@ class Project:
         self._assets = []
         return False
 
-    def assemble(self, locn, initial=[], vote=0, optimiser=optimise):
+    def assemble(self, locn, initial=[], vote=0, optimiser=None):
+        optimiser = optimiser or Project.optimise
         jobs = optimiser(self._assets, initial, vote)
 
         if jobs:
