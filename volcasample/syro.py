@@ -136,7 +136,7 @@ class SamplePacker:
                 else Endian.BigEndian.value)
             rv[i].DataType = dt.value
 
-            assert 8 <= rv[i].Quality <= 16
+            assert 8 <= rv[i].Quality <= 16, fP
         return rv
 
     @staticmethod
