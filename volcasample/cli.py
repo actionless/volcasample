@@ -104,7 +104,7 @@ def add_patch_options(parser):
         "--vote", required=False, type=int, default=0,
         help=(
             "Set a threshold for votes. "
-            "Samples with a vote below this value will not be "
+            "Samples with a vote total below this value will not be "
             "included in the patch."
         )
     )

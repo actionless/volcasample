@@ -45,9 +45,9 @@ def main(args):
         ))
     elif args.command == "patch":
         initial = Project.parse_initial(args.instructions.read())
-        print(initial)
         with Project(args.project, args.start, args.span) as proj:
-            status = proj.assemble(int(args.vote))
+            status = proj.assemble(args.project, initial=initial)
+            print(status)
     elif args.command == "project":
 
         if args.new:
