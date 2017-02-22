@@ -100,6 +100,14 @@ def add_patch_options(parser):
         "--silent", action="store_true", default=False,
         help="Don't play patch file."
     )
+    parser.add_argument(
+        "--vote", required=False, type=int, default=0,
+        help=(
+            "Set a threshold for votes. "
+            "Samples with a vote below this value will not be "
+            "included in the patch."
+        )
+    )
     return parser
 
 def parser(description=__doc__):

@@ -43,12 +43,14 @@ def main(args):
             span=args.span,
             silent=args.silent
         ))
+    elif args.command == "patch":
+        initial = Project.parse_initial(args.instructions.read())
+        print(initial)
+        with Project(args.project, args.start, args.span) as proj:
+            status = proj.assemble(int(args.vote))
     elif args.command == "project":
-        if args.assemble:
-            with Project(args.project, args.start, args.span) as proj:
-                status = proj.assemble(int(args.vote))
 
-        elif args.new:
+        if args.new:
             # TODO: ingest from CLI args
             Project.create(
                 args.project,

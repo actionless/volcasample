@@ -37,7 +37,7 @@ This module provides a workflow for a Volca Sample project.
 class Project:
 
     plot = functools.partial(
-        print, sep="", end="", file=sys.stderr, flush=True
+        print, sep="", end="", file=sys.stdout, flush=True
     )
 
     @staticmethod
@@ -48,7 +48,7 @@ class Project:
         Project.plot("\n")
 
     @staticmethod
-    def progress_point(n=None, clear=2, quiet=False):
+    def progress_point(n=None, clear=2, quiet=False, file_=sys.stderr):
         if quiet:
             return
         elif isinstance(n, int):
@@ -60,7 +60,7 @@ class Project:
         else:
             msg = n
             end = "" if len(n) == 1 else "\n" * clear
-        print(msg, end=end, file=sys.stderr, flush=True)
+        print(msg, end=end, file=file_, flush=True)
 
     @staticmethod
     def parse_initial(text):
@@ -202,7 +202,7 @@ class Project:
         
         for n, grd, tgt in zip(range(start, stop), grades, tgts):
             if "path" in tgt:
-                Project.progress_point(grd, quiet=quiet)
+                Project.plot(grd)
                 wav = wave.open(tgt["path"], "rb")
                 if not silent:
                     rv = Audio.play(wav)
@@ -212,7 +212,7 @@ class Project:
                         rv.wait_done()
                 yield wav
             else:
-                Project.progress_point(" ", quiet=quiet)
+                Project.plot(" ")
                 yield None
         Project.progress_point(quiet=quiet)
 
