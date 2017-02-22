@@ -126,6 +126,7 @@ class SamplePacker:
                 rv[i].pData = ctypes.c_char_p(data)
                 rv[i].Size = len(data)
                 rv[i].Quality = 8 * wav.getsampwidth()
+                assert 8 <= rv[i].Quality <= 16, fP
                 rv[i].Fs = wav.getframerate()
             else:
                 rv[i].pData = None
@@ -136,7 +137,6 @@ class SamplePacker:
                 else Endian.BigEndian.value)
             rv[i].DataType = dt.value
 
-            assert 8 <= rv[i].Quality <= 16, fP
         return rv
 
     @staticmethod
