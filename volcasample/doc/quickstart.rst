@@ -85,3 +85,35 @@ and which to leave out::
 The output is the same as before but as each symbol appears, the sample
 it relates to is played. This takes longer than the ``--silent``
 version of the command.
+
+Define which files to send
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Use a text editor to open the file we created earlier, eg::
+
+    $ vim ~/volcasamples/patch.txt
+
+In order to make sure that our favourite samples get sent to the Volca,
+we leave unchanged the symbols which sit in those slots. But
+we have two options for the slots whose samples we don't have use for:
+
+* Leave that slot unchanged on the Volca because we don't think it's
+  taking much space
+* Delete the sample in that slot to free up space for the ones we like
+
+In your text editor, change the symbol to a space if you want to
+preserve the sound which the Volca stores in that slot. Change the
+symbol to an `X` to delete it.
+
+Save the patch file again when you have finished.
+
+Create a patch for the Volca device
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Direct your edited patch file into the `patch` command::
+
+    $ ~/py3-vs/bin/volcasample patch --silent < ~/volcasamples/patch.txt
+
+The program will create a `volcasamples.wav` file which you must play
+into your Volca's `sync` input. Alternatively, you can omit the
+``--silent`` flag and the patch pattern will play immediately.
