@@ -16,17 +16,28 @@ This is a Python wrapping of the `Korg Volca Sample library`_.
 Features
 ========
 
-* Wraps the public interface of the Korg Volca Library so you can call it from Python
+* Wraps the public interface of the Korg Volca Library so you can call
+  it from your Python code.
+* Creates and maintains project spaces so you can store and rate your
+  samples.
+* Provides a neat command line interface (CLI) for writing a set of
+  samples to your Volca.
 
-Early adopters/developers
-=========================
+Installation
+============
 
-#. Read and follow the `Install notes`_.
-#. `Build the HTML manual`_.
-#. Follow the `Quick Start guide`_.
+The installation process builds the Korg source code which is included
+in this package. Therefore the `gcc` build tools must be present.
+
+Installation has been tested on Ubuntu 16.04 and MacOSX 10.11.
+
+#. Create a virtual environment for volcasample::
+
+    $ python3 -m venv ~/py3-vs
+
+#. Install the latest version in full with pip::
+
+    $ ~/py3-vs/bin/pip install volcasample[audio]
 
 .. _Korg Volca Sample library: http://korginc.github.io/volcasample/index.html
 .. _Volca Factory Sample set: http://www.korg.com/us/support/download/software/0/370/1476/
-.. _Install notes: https://github.com/tundish/volcasample/blob/master/volcasample/doc/install.rst
-.. _Build the HTML manual: https://github.com/tundish/volcasample/blob/master/volcasample/doc/contribute.rst#building-documentation
-.. _Quick Start guide: https://github.com/tundish/volcasample/blob/master/volcasample/doc/quickstart.rst

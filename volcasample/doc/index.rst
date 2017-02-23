@@ -5,7 +5,6 @@ Volcasample package documentation
    :maxdepth: 2
    :caption: Contents:
 
-   install
    quickstart
 
 .. include:: ../../README.rst
