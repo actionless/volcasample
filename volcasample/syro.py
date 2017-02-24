@@ -70,7 +70,7 @@ class Status(enum.Enum):
     NoData = ctypes.c_uint32(8)
 
 
-Handle = ctypes.c_void_p
+Handle = ctypes.c_void_p  #: An opaque pointer to an internal library structure.
 
 
 class SyroData(ctypes.Structure):
@@ -142,7 +142,13 @@ class SamplePacker:
     @staticmethod
     def start(handle, data, nEntries, lib=None):
         """
-        Returns an integer number of output frames.
+        This method wraps the SyroVolcaSample_Start function.
+
+        :param Handle handle: A fresh handle object.
+        :param [SyroData] data: An array containing patch data.
+        :param int nEntries: The number of elements in the array.
+        :return: number of output frames.
+        :rtype: int
 
         """
         assert 0 <= nEntries <= 110
