@@ -213,6 +213,15 @@ class SamplePacker:
 
     @staticmethod
     def get_samples(handle, nFrames, lib=None):
+        """
+        This method wraps the SyroVolcaSample_GetSample function.
+
+        :param Handle handle: A fresh handle object.
+        :param int nFrames: The number of sample frames to be returned.
+        :return: A sequence of stereo (2-tuple) samples.
+        :rtype: generator
+
+        """
         fn = SamplePacker.wrap_sample_fn()
         fn.restype = ctypes.c_uint8
         left = ctypes.c_int16()
@@ -228,6 +237,14 @@ class SamplePacker:
 
     @staticmethod
     def end(handle, lib=None):
+        """
+        This method wraps the SyroVolcaSample_End function.
+
+        :param Handle handle: A fresh handle object.
+        :return: status.
+        :rtype: Status
+
+        """
 
         def check(result, fn, args):
             return next(
