@@ -6,6 +6,7 @@ Volcasample package documentation
    :caption: Contents:
 
    quickstart
+   cli
    api
 
 .. include:: ../../README.rst

@@ -70,7 +70,7 @@ def add_project_options(parser):
         "--check", action="store_true", default=False,
         help=(
             "Check the audio file(s) can be loaded to the Volca. "
-            "This command coverts stereo files to mono if necessary."
+            "This command converts stereo files to mono if necessary."
         )
     )
     parser.add_argument(
@@ -133,7 +133,7 @@ def parsers(description=__doc__):
     p = subparsers.add_parser(
         "audition",
         help="Volca Sample 'audition' command.",
-        description="Listen to project audio."
+        description="Evaluate your project audio."
     )
     p = add_audition_options(p)
 
@@ -145,3 +145,6 @@ def parsers(description=__doc__):
     p = add_patch_options(p)
 
     return (rv, subparsers)
+
+def cli():
+    return parsers()[0]
