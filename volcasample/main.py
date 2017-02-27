@@ -93,7 +93,7 @@ def main(args):
             list(Project.check(
                 args.project,
                 start=args.start,
-                span=args.span
+                span=args.span,
             ))
     return 0
 

@@ -113,24 +113,24 @@ class Project:
             for i in range(start, stop)
         )
         for n, tgt in zip(range(start, stop), tgts):
+            fP = os.path.join(
+                path, "{0:02}".format(n), "metadata.json"
+            )
+            try:
+                # Try to load previous metadata
+                with open(fP, "r") as prev:
+                    history = json.load(prev)
+            except FileNotFoundError:
+                pass  # Use default values for history
+
             try:
                 src = next(iter(glob.glob(tgt)))
                 w = wave.open(src, "rb")
                 params = w.getparams()
                 metadata = Audio.metadata(params, src)
             except (FileNotFoundError, StopIteration):
-                metadata = {}
-
-            # Try to load previous metadata
-            fP = os.path.join(
-                path, "{0:02}".format(n), "metadata.json"
-            )
-
-            try:
-                with open(fP, "r") as prev:
-                    history = json.load(prev)
-            except FileNotFoundError:
-                history = OrderedDict([("slot", n), ("vote", 0)])
+                history = {}
+                metadata = OrderedDict([("slot", n), ("vote", 0)])
 
             history.update(metadata)
             Project.progress_point(n, quiet=quiet)
@@ -170,9 +170,12 @@ class Project:
         for n, tgt in zip(range(start, stop), tgts):
             if tgt.get("nchannels", 0) > 1 or tgt.get("sampwidth", 0) > 2:
                 fP = os.path.splitext(tgt["path"])[0] + ".ref"
-                os.replace(tgt["path"], fP)
-                with wave.open(fP, "rb") as wav:
-                    Audio.wav_to_mono(wav, tgt["path"])
+                try:
+                    os.replace(tgt["path"], fP)
+                    with wave.open(fP, "rb") as wav:
+                        Audio.wav_to_mono(wav, tgt["path"])
+                except FileNotFoundError:
+                    pass
 
             yield from Project.refresh(path, n, span=1, quiet=True)
             Project.progress_point(n, quiet=quiet)
