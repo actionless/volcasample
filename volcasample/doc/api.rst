@@ -8,7 +8,8 @@ Data structures
 ===============
 
 .. automodule:: volcasample.syro
-   :members:
+   :members: Endian, DataType, Status
+   :undoc-members:
    :member-order: bysource
 
 SamplePacker class

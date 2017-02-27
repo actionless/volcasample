@@ -30,7 +30,6 @@ import pkg_resources
 
 import volcasample.syro
 from volcasample.syro import pick_lib
-from volcasample.syro import point_to_bytememory
 from volcasample.syro import DataType
 from volcasample.syro import Endian
 from volcasample.syro import Handle
@@ -233,7 +232,7 @@ class SamplePackerTests(unittest.TestCase):
         data = sinedata(800)
         self.assertEqual(88200, len(data))
         patch[0].Number = 0
-        patch[0].pData = point_to_bytememory(data)
+        patch[0].pData = ctypes.c_char_p(data)
         patch[0].Size = len(data)
         patch[0].Quality = 16
         patch[0].Fs = 44100

@@ -37,18 +37,22 @@ def pick_lib(pkg="volcasample", locn="lib"):
     return ctypes.cdll.LoadLibrary(next(lib_paths(pkg, locn)))
 
 
-def point_to_bytememory(data):
-	return ctypes.cast(data, ctypes.POINTER(ctypes.c_uint8))
-
-
 @enum.unique
 class Endian(enum.Enum):
+    """
+    Shadows the Endian enumeration in the Syro C library.
+
+    """
     LittleEndian = ctypes.c_uint32(0)
     BigEndian = ctypes.c_uint32(1)
 
 
 @enum.unique
 class DataType(enum.Enum):
+    """
+    Shadows the DataType enumeration in the Syro C library.
+
+    """
     Sample_Liner = ctypes.c_uint32(0)
     Sample_Compress = ctypes.c_uint32(1)
     Sample_Erase = ctypes.c_uint32(2)
@@ -59,6 +63,10 @@ class DataType(enum.Enum):
 
 @enum.unique
 class Status(enum.Enum):
+    """
+    Shadows the Status enumeration in the Syro C library.
+
+    """
     Success = ctypes.c_uint32(0)
     IllegalDataType = ctypes.c_uint32(1)
     IllegalData = ctypes.c_uint32(2)
