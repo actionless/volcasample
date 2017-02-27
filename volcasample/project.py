@@ -41,10 +41,10 @@ class Project:
     )
 
     @staticmethod
-    def scale(n=100):
-        Project.plot(*[i // 10 for i in range(n)])
+    def scale(pos=0, n=100):
+        Project.plot(*[i // 10 for i in range(pos, n)])
         Project.plot("\n")
-        Project.plot(*[i % 10 for i in range(n)])
+        Project.plot(*[i % 10 for i in range(pos, n)])
         Project.plot("\n")
 
     @staticmethod
@@ -194,7 +194,7 @@ class Project:
         )
         tgts = list(Project.refresh(path, start, span, quiet=True))
 
-        Project.scale()
+        Project.scale(start, stop)
         # 4 MB, 65s
        
         
