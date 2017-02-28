@@ -82,7 +82,10 @@ Handle = ctypes.c_void_p  #: An opaque pointer to an internal library structure.
 
 
 class SyroData(ctypes.Structure):
+    """
+    Shadows the SyroData structure in the Syro C library.
 
+    """
     _fields_  = [
         ("DataType", ctypes.c_uint32),
         ("pData", ctypes.c_char_p),
@@ -95,35 +98,33 @@ class SyroData(ctypes.Structure):
 
 
 class SamplePacker:
+    """
+    This class contains all the methods needed to program a
+    Volca Sample device.
 
-    @staticmethod
-    def build(patch, locn=None, output="volcasamples.wav"):
-        locn = locn or os.path.expanduser("~")
-        handle = Handle()
-        try:
-            nFrames = SamplePacker.start(handle, patch, len(patch))
-            rv = list(SamplePacker.get_samples(handle, nFrames))
+    #. Use :py:meth:`volcasample.syro.SamplePacker.patch` to populate
+       patch data.
+    #. Produce a data file from the patch with
+       :py:meth:`volcasample.syro.SamplePacker.build`.
 
-            with wave.open(os.path.join(locn, output), "wb") as wav:
-                wav.setparams(wave._wave_params(
-                    nchannels=2,
-                    sampwidth=2,
-                    framerate=44100,
-                    nframes=nFrames,
-                    comptype="NONE",
-                    compname="not compressed"
-                ))
-                for l, r in rv:
-                    wav.writeframesraw(struct.pack("<hh", l, r))
-
-        finally:
-            return SamplePacker.end(handle)
+    """
 
     @staticmethod
     def patch(jobs):
         """
-        Jobs is an ordered dictionary of {int: (dataType, filePath)}
+        :param jobs: An OrderedDict of
+         {int: (:py:class:`volcasample.syro.DataType`, str)}.
 
+             * The keys are indexes of sample slots (0 - 99).
+             * Values are 2-tuples, such that:
+
+                #. First element determines whether to load
+                   or delete the slot.
+                #. Second element is a path to an audio sample
+                   file.
+
+        :return: An array containing patch data.
+        :rtype: [SyroData]
         """
         rv = (SyroData * len(jobs))()
         for i, (n, (dt, fP)) in enumerate(jobs.items()):
@@ -148,6 +149,39 @@ class SamplePacker:
         return rv
 
     @staticmethod
+    def build(patch, locn=None, output="volcasamples.wav"):
+        """
+        Create a WAV file with patch data for a Volca device.
+
+        :param [SyroData] patch: An array containing patch data.
+        :param str locn: A file path to the root of the project tree.
+        :param str output: The name of the output file.
+        :return: Final status from the C library.
+        :rtype: Status
+
+        """
+        locn = locn or os.path.expanduser("~")
+        handle = Handle()
+        try:
+            nFrames = SamplePacker.start(handle, patch, len(patch))
+            rv = list(SamplePacker.get_samples(handle, nFrames))
+
+            with wave.open(os.path.join(locn, output), "wb") as wav:
+                wav.setparams(wave._wave_params(
+                    nchannels=2,
+                    sampwidth=2,
+                    framerate=44100,
+                    nframes=nFrames,
+                    comptype="NONE",
+                    compname="not compressed"
+                ))
+                for l, r in rv:
+                    wav.writeframesraw(struct.pack("<hh", l, r))
+
+        finally:
+            return SamplePacker.end(handle)
+
+    @staticmethod
     def start(handle, data, nEntries, lib=None):
         """
         This method wraps the SyroVolcaSample_Start function.
@@ -155,7 +189,7 @@ class SamplePacker:
         :param Handle handle: A fresh handle object.
         :param [SyroData] data: An array containing patch data.
         :param int nEntries: The number of elements in the array.
-        :return: number of output frames.
+        :return: Number of output frames.
         :rtype: int
 
         """
@@ -249,7 +283,7 @@ class SamplePacker:
         This method wraps the SyroVolcaSample_End function.
 
         :param Handle handle: A fresh handle object.
-        :return: status.
+        :return: Syro C library status.
         :rtype: Status
 
         """
