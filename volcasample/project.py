@@ -113,32 +113,33 @@ class Project:
             for i in range(start, stop)
         )
         for n, tgt in zip(range(start, stop), tgts):
+            # Metadata defaults
+            metadata = OrderedDict([("slot", n), ("vote", 0)])
+
+            # Try to load previous metadata
             fP = os.path.join(
                 path, "{0:02}".format(n), "metadata.json"
             )
             try:
-                # Try to load previous metadata
                 with open(fP, "r") as prev:
-                    history = json.load(prev)
+                    metadata.update(json.load(prev))
             except FileNotFoundError:
-                pass  # Use default values for history
+                pass  # Use default values for metadata
 
             try:
                 src = next(iter(glob.glob(tgt)))
                 w = wave.open(src, "rb")
                 params = w.getparams()
-                metadata = Audio.metadata(params, src)
+                metadata.update(Audio.metadata(params, src))
             except (FileNotFoundError, StopIteration):
-                history = {}
-                metadata = OrderedDict([("slot", n), ("vote", 0)])
+                pass  # Use default values for metadata
 
-            history.update(metadata)
             Project.progress_point(n, quiet=quiet)
 
             with open(fP, "w") as new:
-                json.dump(history, new, indent=0, sort_keys=True)
+                json.dump(metadata, new, indent=0, sort_keys=True)
 
-            yield history
+            yield metadata
         Project.progress_point(quiet=quiet)
 
     @staticmethod
