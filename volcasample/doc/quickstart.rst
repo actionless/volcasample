@@ -103,7 +103,13 @@ we have two options for the slots whose samples we don't have use for:
 
 In your text editor, change the symbol to a space if you want to
 preserve the sound which the Volca stores in that slot. Change the
-symbol to an `X` to delete it.
+symbol to an `X` to delete it:
+
+.. code-block:: none
+
+    0000000000111111111122.....6666666666777777777788888888889999999999
+    0123456789012345678901.....0123456789012345678901234567890123456789
+    .::.:::.:..:XXXXX:XXXX.....XXXXXXX:Iiiii:iIXiiiiiiiIXXXXXXXXXXXXXXX
 
 Save the patch file again when you have finished.
 
