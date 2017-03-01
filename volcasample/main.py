@@ -29,6 +29,7 @@ import volcasample
 import volcasample.cli
 from volcasample.audio import Audio
 from volcasample.project import Project
+from volcasample.syro import Status
 
 __doc__ = """
 This module provides a workflow for a Volca Sample project.
@@ -36,6 +37,7 @@ This module provides a workflow for a Volca Sample project.
 """
 
 def main(args):
+    rv = 0
     if args.command == "audition":
         list(Project.audition(
             args.project,
@@ -46,12 +48,19 @@ def main(args):
     elif args.command == "patch":
         initial = Project.parse_initial(args.instructions.read())
         with Project(args.project, args.start, args.span) as proj:
-            status = proj.assemble(args.project, initial=initial.values())
-            print(status)
+            status, fP = proj.assemble(args.project, initial=initial.values())
+            print(status, file=sys.stderr)
+            if status is Status.Success and not args.silent:
+                with wave.open(fP, "rb") as wav:
+                    audio = Audio.play(wav)
+                    if audio is None:
+                       rv = 1 
+                    else:
+                        audio.wait_done()
+
     elif args.command == "project":
 
         if args.new:
-            # TODO: ingest from CLI args
             Project.create(
                 args.project,
                 start=args.start,
@@ -95,7 +104,7 @@ def main(args):
                 start=args.start,
                 span=args.span,
             ))
-    return 0
+    return rv
 
 def run():
     p, subs = volcasample.cli.parsers()
