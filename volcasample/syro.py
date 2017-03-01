@@ -154,19 +154,20 @@ class SamplePacker:
         Create a WAV file with patch data for a Volca device.
 
         :param [SyroData] patch: An array containing patch data.
-        :param str locn: A file path to the root of the project tree.
+        :param str locn: A path to a writeable directory.
         :param str output: The name of the output file.
-        :return: Final status from the C library.
-        :rtype: Status
+        :return: A 2-tuple of (status, file path).
+        :rtype: tuple
 
         """
         locn = locn or os.path.expanduser("~")
+        fP = os.path.join(locn, output)
         handle = Handle()
         try:
             nFrames = SamplePacker.start(handle, patch, len(patch))
             rv = list(SamplePacker.get_samples(handle, nFrames))
 
-            with wave.open(os.path.join(locn, output), "wb") as wav:
+            with wave.open(fP, "wb") as wav:
                 wav.setparams(wave._wave_params(
                     nchannels=2,
                     sampwidth=2,
@@ -179,7 +180,7 @@ class SamplePacker:
                     wav.writeframesraw(struct.pack("<hh", l, r))
 
         finally:
-            return SamplePacker.end(handle)
+            return (SamplePacker.end(handle), fP)
 
     @staticmethod
     def start(handle, data, nEntries, lib=None):

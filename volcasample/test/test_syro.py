@@ -291,10 +291,11 @@ class SamplePackerTests(unittest.TestCase):
 
         fD, fP = tempfile.mkstemp(suffix=".wav")
         try:
-            status = volcasample.syro.SamplePacker.build(
+            status, rv = volcasample.syro.SamplePacker.build(
                 patch, *os.path.split(fP)
             )
             self.assertIs(status, Status.Success)
+            self.assertEqual(fP, rv)
             with wave.open(fP, "rb") as wav:
                 params = wav.getparams()._asdict()
                 nFrames = params.pop("nframes")
@@ -330,10 +331,11 @@ class SamplePackerTests(unittest.TestCase):
 
         fD, fP = tempfile.mkstemp(suffix=".wav")
         try:
-            status = volcasample.syro.SamplePacker.build(
+            status, rv = volcasample.syro.SamplePacker.build(
                 patch, *os.path.split(fP)
             )
             self.assertIs(status, Status.Success)
+            self.assertEqual(fP, rv)
             with wave.open(fP, "rb") as wav:
                 params = wav.getparams()._asdict()
                 nFrames = params.pop("nframes")

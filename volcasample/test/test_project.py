@@ -159,10 +159,10 @@ class ProjectAssembleTests(CopiesTestData, unittest.TestCase):
 
     def test_assemble_single_slot(self):
         with Project(self.drcty.name, 0, 1) as proj:
-            status = proj.assemble(initial=[True], locn=self.drcty.name)
+            status, fP = proj.assemble(initial=[True], locn=self.drcty.name)
         self.assertIs(status, Status.Success)
 
     def test_assemble_three_slots(self):
         with Project(self.drcty.name, 0, 3, quiet=True) as proj:
-            status = proj.assemble(initial=[True] * 3, locn=self.drcty.name)
+            status, fP = proj.assemble(initial=[True] * 3, locn=self.drcty.name)
         self.assertIs(status, Status.Success)
