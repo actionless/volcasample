@@ -6,7 +6,7 @@ import os.path
 import sys
 
 from setuptools import setup
-from distutils.extension import Extension
+from setuptools.extension import Extension
 
 try:
     # For setup.py install

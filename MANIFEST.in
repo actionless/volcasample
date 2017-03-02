@@ -1,2 +1,2 @@
 recursive-include volcasample *.css *.jpg *.js *.png *.rst
-
+global-exclude *.so *.dll
