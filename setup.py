@@ -69,7 +69,7 @@ setup(
     },
     ext_modules=[
         Extension(
-            name="syro",
+            name="volcasample.syro",
             sources=[
                 "syro/korg_syro_comp.c",
                 "syro/korg_syro_func.c",
