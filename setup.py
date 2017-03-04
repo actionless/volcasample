@@ -58,7 +58,7 @@ setup(
             "doc/html/_static/*.gif",
             "doc/html/_static/*.js",
             "doc/html/_static/*.png",
-            "lib/*",
+            "lib/volcasample/*",
             "../COPYING",
             "../syro/*.h",
             "../syro/*.c",
