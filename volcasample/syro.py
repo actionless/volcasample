@@ -25,7 +25,7 @@ import sys
 import wave
 
 
-def lib_paths(pkg="volcasample", locn="lib"):
+def lib_paths(pkg="volcasample", locn="lib/volcasample"):
     dirPath = pkg_resources.resource_filename(pkg, locn)
     return (
         os.path.join(dirPath, fN)
@@ -33,7 +33,7 @@ def lib_paths(pkg="volcasample", locn="lib"):
     )
 
 
-def pick_lib(pkg="volcasample", locn="lib"):
+def pick_lib(pkg="volcasample", locn="lib/volcasample"):
     return ctypes.cdll.LoadLibrary(next(lib_paths(pkg, locn)))
 
 
