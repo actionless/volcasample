@@ -2,3 +2,10 @@
 *.a
 *.so
 *.so.*
+**/__pycache__/
+
+build/
+dist/
+env/
+syro_build/
+volcasample.egg-info/
